@@ -1,0 +1,36 @@
+post:
+  tags:
+    - Proofs
+  summary: Create the proof
+  description: |
+    Allows to create a proof in the service database. After saving the proof, it will be accessible by its ID.
+  operationId: saveProof
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/ProofCreate'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Proof'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    401:
+      $ref: '#/components/responses/unauthorized'
+    500:
+      $ref: '#/components/responses/internalError'
+
