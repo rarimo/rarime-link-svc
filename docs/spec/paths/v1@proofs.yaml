@@ -4,7 +4,9 @@ post:
   summary: Create the proof
   description: |
     Allows to create a proof in the service database. After saving the proof, it will be accessible by its ID.
-  operationId: saveProof
+  operationId: createProof
+  security:
+    - Bearer: []
   requestBody:
     required: true
     content:
@@ -30,7 +32,7 @@ post:
     400:
       $ref: '#/components/responses/invalidParameter'
     401:
-      $ref: '#/components/responses/unauthorized'
+      $ref: '#/components/responses/invalidAuth'
     500:
       $ref: '#/components/responses/internalError'
 

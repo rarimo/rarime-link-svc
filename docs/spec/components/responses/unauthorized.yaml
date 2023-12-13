@@ -1,5 +1,0 @@
-description: You are not authorized to access this resource.
-content:
-  application/vnd.api+json:
-    schema:
-      $ref: '#/components/schemas/Errors'
