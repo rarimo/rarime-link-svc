@@ -16,7 +16,6 @@ allOf:
             description: The ID of the user who created the proof
           created_at:
             type: string
-            format: timestamp
             description: The date and time when the proof was created in the timestamp format
             example: '1702480643'
           proof:

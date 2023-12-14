@@ -20,10 +20,18 @@ func Run(ctx context.Context, cfg config.Config) {
 	r.Use(
 		ape.CtxMiddleware(
 			handlers.CtxLog(cfg.Log()),
+			handlers.CtxStorage(cfg.Storage()),
 		),
 	)
 
 	r.Route("/v1", func(r chi.Router) {
+		r.Route("/proofs", func(r chi.Router) {
+			r.Use(handlers.AuthMiddleware())
+			r.Post("/", handlers.ProofCreate)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Get("/", handlers.ProofByID)
+			})
+		})
 	})
 
 	cfg.Log().WithFields(logan.F{
