@@ -30,7 +30,7 @@ func Run(args []string) {
 	cfg := config.New(kv.MustFromEnv())
 	log = cfg.Log()
 
-	app := kingpin.New("horizon", "")
+	app := kingpin.New("rarimo-dashboard-link-svc", "")
 
 	runCmd := app.Command("run", "run command")
 	apiCmd := runCmd.Command("api", "run API")
