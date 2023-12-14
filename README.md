@@ -118,4 +118,4 @@ This project is under the MIT License - see the [LICENSE](LICENSE) file for deta
 [Docker installation guide]: https://docs.docker.com/get-docker/
 [Go installation guide]: https://golang.org/doc/install
 [swagger editor]: http://localhost:8080/swagger-editor/
-[www.openapi:json]: https://www.openapis.org/
+[openapi:json]: https://www.openapis.org/
