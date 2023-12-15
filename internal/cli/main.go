@@ -92,6 +92,7 @@ func Run(args []string) {
 	case <-ctx.Done():
 		cfg.Log().WithError(ctx.Err()).Info("Interrupt signal received")
 		stop()
+		<-wgch
 	case <-wgch:
 		cfg.Log().Warn("all services stopped")
 	}
