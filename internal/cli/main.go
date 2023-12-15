@@ -3,12 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
+	"github.com/rarimo/dashboard-rarime-link-svc/internal/services/api"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
-
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/services/api"
 
 	"gitlab.com/distributed_lab/logan/v3/errors"
 
@@ -44,7 +43,8 @@ func Run(args []string) {
 		panic(errors.Wrap(err, "failed to parse args"))
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	wg := sync.WaitGroup{}
 
@@ -89,11 +89,10 @@ func Run(args []string) {
 	}()
 
 	select {
+	case <-ctx.Done():
+		cfg.Log().WithError(ctx.Err()).Info("Interrupt signal received")
+		stop()
 	case <-wgch:
 		cfg.Log().Warn("all services stopped")
-	case <-gracefulStop:
-		cfg.Log().Info("received signal to stop")
-		cancel()
-		<-wgch
 	}
 }
