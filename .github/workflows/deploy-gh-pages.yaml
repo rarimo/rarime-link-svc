@@ -22,11 +22,12 @@ jobs:
         with:
           node-version: '18'
 
-      - run: cd ./docs
-      - run: npm install
-      - run: npm run build
+      - run: |
+          cd ./docs
+          npm install
+          npm run build
 
-      - run: touch doc/.nojekyll
+      - run: touch docs/.nojekyll
       - name: Deploy docs 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
