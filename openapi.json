@@ -1,0 +1,348 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Dashboard Rarime Link Service",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.demo.tokend.io",
+      "description": "dashboard-rarime-link-svc"
+    }
+  ],
+  "paths": {
+    "/v1/proofs": {
+      "post": {
+        "tags": [
+          "Proofs"
+        ],
+        "summary": "Create the proof",
+        "description": "Allows to create a proof in the service database. After saving the proof, it will be accessible by its ID.\n",
+        "operationId": "createProof",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProofCreate"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Proof"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidAuth"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/v1/proofs/{id}": {
+      "get": {
+        "summary": "Get Proof by ID",
+        "description": "Returns information about the particular proof.\n",
+        "operationId": "proofByID",
+        "tags": [
+          "Proofs"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "The ID of the proof",
+            "schema": {
+              "type": "string",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Proof"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Enum": {
+        "type": "object",
+        "required": [
+          "value",
+          "name"
+        ],
+        "properties": {
+          "value": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "General"
+          }
+        }
+      },
+      "Errors": {
+        "description": "Standard JSON:API error",
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "Non empty array of errors occurred during request processing",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "status"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Title is a short, human-readable summary of the problem",
+                  "example": "Bad Request"
+                },
+                "detail": {
+                  "type": "string",
+                  "description": "Detail is a human-readable explanation specific to this occurrence of the problem",
+                  "example": "Request body was expected"
+                },
+                "status": {
+                  "type": "integer",
+                  "description": "Status is the HTTP status code applicable to this problem",
+                  "example": 400,
+                  "enum": [
+                    400,
+                    401,
+                    403,
+                    404,
+                    409,
+                    500
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Proof": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProofKey"
+          },
+          {
+            "type": "object",
+            "required": [
+              "attributes"
+            ],
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "creator",
+                  "created_at",
+                  "proof"
+                ],
+                "properties": {
+                  "creator": {
+                    "type": "string",
+                    "description": "The ID of the user who created the proof"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "description": "The date and time when the proof was created in the timestamp format",
+                    "example": "1702480643"
+                  },
+                  "proof": {
+                    "type": "string",
+                    "description": "The proof object in JSON string format",
+                    "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ProofCreate": {
+        "type": "object",
+        "required": [
+          "proof"
+        ],
+        "properties": {
+          "proof": {
+            "type": "string",
+            "description": "The proof object in JSON string format",
+            "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+          }
+        }
+      },
+      "ProofKey": {
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "proofs"
+            ]
+          }
+        }
+      }
+    },
+    "responses": {
+      "internalError": {
+        "description": "Internal server error",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Errors"
+            }
+          }
+        }
+      },
+      "invalidAuth": {
+        "description": "You must provide a valid authorization params.",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Errors"
+            }
+          }
+        }
+      },
+      "invalidParameter": {
+        "description": "One of the parameters is invalid. Refer to the response body for details.",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Errors"
+            }
+          }
+        }
+      },
+      "notFound": {
+        "description": "Requested resource does not exist.",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Errors"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "pageCursorParam": {
+        "in": "query",
+        "name": "page[cursor]",
+        "required": false,
+        "description": "A pointer to start the page of results with. To get a link to the next page, use the URL in the `links.next` field in the response, which includes the value for this parameter.",
+        "schema": {
+          "type": "string",
+          "example": "MTA6MjE="
+        }
+      },
+      "pageLimitParam": {
+        "in": "query",
+        "name": "page[limit]",
+        "required": false,
+        "example": 50,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 15,
+          "description": "Numbers of items per page to return."
+        }
+      },
+      "sortingParam": {
+        "in": "query",
+        "name": "sort",
+        "required": false,
+        "example": "-time",
+        "schema": {
+          "type": "string",
+          "description": "Order of records on the page. Format is `[-]{columnName}`; minus sign makes the order descending. Each endpoint specifies its own set of columns to sort data by."
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
