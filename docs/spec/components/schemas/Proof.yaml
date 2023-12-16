@@ -1,0 +1,24 @@
+allOf:
+  - $ref: '#/components/schemas/ProofKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - creator
+          - created_at
+          - proof
+        properties:
+          creator:
+            type: string
+            description: The ID of the user who created the proof
+          created_at:
+            type: string
+            description: The date and time when the proof was created in the timestamp format
+            example: '1702480643'
+          proof:
+            type: string
+            description: The proof object in JSON string format
+            example: "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
