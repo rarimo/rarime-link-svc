@@ -1,6 +1,6 @@
-# Rarime Dashboard Link Service
+# Rarime Link Service
 
-Rarime Dashboard Link Service stores users proofs and provide simple access to it via REST API in [JSON:API] format.
+Rarime Link Service stores users proofs and provide simple access to it via REST API in [JSON:API] format.
 
 ## Getting Started
 ### Prerequisites
@@ -19,8 +19,8 @@ To build the service binary file, follow these steps:
 1. Clone the repository.
 
     ```bash
-    git clone github.com/rarimo/dashboard-rarime-link-svc
-    cd dashboard-rarime-link-svc
+    git clone github.com/rarimo/rarime-link-svc
+    cd rarime-link-svc
     ```
 
 1. Install dependencies and build the service.
@@ -38,8 +38,8 @@ To build the service Docker image, follow these steps:
 1. Clone the repository.
 
     ```bash
-    git clone github.com/rarimo/dashboard-rarime-link-svc
-    cd dashboard-rarime-link-svc
+    git clone github.com/rarimo/rarime-link-svc
+    cd rarime-link-svc
     ```
 
 1. Build the service image.

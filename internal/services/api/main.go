@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/config"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/services/api/handlers"
+	"github.com/rarimo/rarime-link-svc/internal/config"
+	"github.com/rarimo/rarime-link-svc/internal/services/api/handlers"
 	"gitlab.com/distributed_lab/ape"
 )
 

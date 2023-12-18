@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/assets"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/config"
+	"github.com/rarimo/rarime-link-svc/internal/assets"
+	"github.com/rarimo/rarime-link-svc/internal/config"
 	migrate "github.com/rubenv/sql-migrate"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )

@@ -1,4 +1,4 @@
-module github.com/rarimo/dashboard-rarime-link-svc
+module github.com/rarimo/rarime-link-svc
 
 go 1.20
 

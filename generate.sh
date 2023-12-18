@@ -4,8 +4,8 @@ GENERATOR_IMAGE=registry.gitlab.com/tokend/openapi-go-generator:c59241b52b0e37bb
 
 [[ ! -x "$(command -v go 2>/dev/null)" ]] && echo "go is not installed" && exit 1
 
-GENERATED="$(go env GOPATH)/src/github.com/rarimo/dashboard-rarime-link-svc/resources"
-OPENAPI_DIR="$(go env GOPATH)/src/github.com/rarimo/dashboard-rarime-link-svc/docs/web_deploy"
+GENERATED="$(go env GOPATH)/src/github.com/rarimo/rarime-link-svc/resources"
+OPENAPI_DIR="$(go env GOPATH)/src/github.com/rarimo/rarime-link-svc/docs/web_deploy"
 PACKAGE_NAME=resources
 
 function printHelp {
