@@ -4,7 +4,7 @@ RUN apk add build-base git
 
 ARG CI_JOB_TOKEN
 
-WORKDIR /go/src/github.com/rarimo/dashboard-rarime-link-svc
+WORKDIR /go/src/github.com/rarimo/rarime-link-svc
 
 COPY . .
 
@@ -14,13 +14,13 @@ ENV GOOS="linux"
 
 RUN go mod tidy
 RUN go mod vendor
-RUN go build -o /usr/local/bin/dashboard-rarime-link-svc github.com/rarimo/dashboard-rarime-link-svc
+RUN go build -o /usr/local/bin/rarime-link-svc github.com/rarimo/rarime-link-svc
 
 ###
 
 FROM alpine:3.9
 
-COPY --from=buildbase /usr/local/bin/dashboard-rarime-link-svc /usr/local/bin/dashboard-rarime-link-svc
+COPY --from=buildbase /usr/local/bin/rarime-link-svc /usr/local/bin/rarime-link-svc
 RUN apk add --no-cache ca-certificates
 
-ENTRYPOINT ["dashboard-rarime-link-svc"]
+ENTRYPOINT ["rarime-link-svc"]

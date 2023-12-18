@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/data"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 	"gitlab.com/distributed_lab/logan/v3"
 	"net/http"
 )

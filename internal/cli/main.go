@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/services/api"
+	"github.com/rarimo/rarime-link-svc/internal/services/api"
 	"os"
 	"os/signal"
 	"sync"
@@ -12,7 +12,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/config"
+	"github.com/rarimo/rarime-link-svc/internal/config"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3"
 )
@@ -29,7 +29,7 @@ func Run(args []string) {
 	cfg := config.New(kv.MustFromEnv())
 	log = cfg.Log()
 
-	app := kingpin.New("rarimo-dashboard-link-svc", "")
+	app := kingpin.New("rarimo-link-svc", "")
 
 	runCmd := app.Command("run", "run command")
 	apiCmd := runCmd.Command("api", "run API")

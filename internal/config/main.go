@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/data"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/data/pg"
+	"github.com/rarimo/rarime-link-svc/internal/data"
+	"github.com/rarimo/rarime-link-svc/internal/data/pg"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/kit/kv"

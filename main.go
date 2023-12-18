@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/cli"
+	"github.com/rarimo/rarime-link-svc/internal/cli"
 	"os"
 )
 

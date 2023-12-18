@@ -1,6 +1,6 @@
 FROM golang:1.20-alpine as buildbase
 
-WORKDIR /go/src/github.com/rarimo/dashboard-rarime-link-svc
+WORKDIR /go/src/github.com/rarimo/rarime-link-svc
 COPY vendor .
 COPY . .
 
@@ -8,7 +8,7 @@ ENV GO111MODULE="on"
 ENV CGO_ENABLED=0
 ENV GOOS="linux"
 
-RUN go build -o /usr/local/bin/dashboard-rarime-link-svc github.com/rarimo/dashboard-rarime-link-svc
+RUN go build -o /usr/local/bin/rarime-link-svc github.com/rarimo/rarime-link-svc
 
 ###
 
@@ -18,5 +18,5 @@ RUN apk add --no-cache ca-certificates
 
 FROM calpine
 
-COPY --from=buildbase /usr/local/bin/dashboard-rarime-link-svc /usr/local/bin/dashboard-rarime-link-svc
-ENTRYPOINT ["dashboard-rarime-link-svc"]
+COPY --from=buildbase /usr/local/bin/rarime-link-svc /usr/local/bin/rarime-link-svc
+ENTRYPOINT ["rarime-link-svc"]

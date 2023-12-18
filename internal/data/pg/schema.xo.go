@@ -6,7 +6,7 @@ package pg
 import (
 	"context"
 	"database/sql"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/data"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 
 	"gitlab.com/distributed_lab/kit/pgdb"
 	"gitlab.com/distributed_lab/logan/v3/errors"

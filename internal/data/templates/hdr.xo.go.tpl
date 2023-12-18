@@ -23,7 +23,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
-	"github.com/rarimo/dashboard-rarime-link-svc/internal/data"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 {{- if driver "postgres" }}
 	"github.com/lib/pq/hstore"
 	"github.com/rarimo/xo/types/xo"
