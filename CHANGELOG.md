@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2023-12-18
+## [v0.1.0] - 2023-12-18
 ### Changed
 - Initiated project
 
-[Unreleased]: https://github.com/rarimo/rarime-link-svc/compare/0.1.0...HEAD
-[0.1.0]: https://github.com/rarimo/rarime-link-svc/releases/tag/0.1.0
+[Unreleased]: https://github.com/rarimo/rarime-link-svc/compare/v0.1.0...HEAD
+[v0.1.0]: https://github.com/rarimo/rarime-link-svc/releases/tag/v0.1.0
