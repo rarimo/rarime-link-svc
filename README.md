@@ -2,11 +2,6 @@
 
 Rarime Link Service stores users proofs and provide simple access to it via REST API in [JSON:API] format.
 
-## Description
-
-The service includes 1 main runner:<br>
-```proofs-cleaner```: removes expired proofs from the database.
-
 ## Getting Started
 ### Prerequisites
 
