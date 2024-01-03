@@ -291,3 +291,67 @@ func (q ProofQ) ProofByIDCtx(ctx context.Context, id int, isForUpdate bool) (*da
 func (q ProofQ) ProofByID(id int, isForUpdate bool) (*data.Proof, error) {
 	return q.ProofByIDCtx(context.Background(), id, isForUpdate)
 }
+
+// ProofsByUserDIDCtx retrieves all proofs for a given userDID from 'public.proofs'.
+func (q ProofQ) ProofsByUserDIDCtx(ctx context.Context, userDID string, isForUpdate bool) ([]data.Proof, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, creator, created_at, proof ` +
+		`FROM public.proofs ` +
+		`WHERE creator = $1`
+	// run
+	if isForUpdate {
+		sqlstr += " for update"
+	}
+	var proofs []data.Proof
+	err := q.db.SelectRawContext(ctx, &proofs, sqlstr, userDID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute select")
+	}
+
+	return proofs, nil
+}
+
+// ProofsByUserDID retrieves all proofs for a given userDID from 'public.proofs'.
+func (q ProofQ) ProofsByUserDID(userDID string, isForUpdate bool) ([]data.Proof, error) {
+	return q.ProofsByUserDIDCtx(context.Background(), userDID, isForUpdate)
+}
+
+// SelectAllCtx retrieves all rows from 'public.proofs'.
+func (q ProofQ) SelectAllCtx(ctx context.Context) ([]*data.Proof, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, creator, created_at, proof ` +
+		`FROM public.proofs`
+	// run
+	var proofs []*data.Proof
+	err := q.db.SelectRawContext(ctx, &proofs, sqlstr)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute select")
+	}
+
+	return proofs, nil
+}
+
+// SelectAll retrieves all rows from 'public.proofs'.
+func (q ProofQ) SelectAll() ([]*data.Proof, error) {
+	return q.SelectAllCtx(context.Background())
+}
+
+// DeleteCtx deletes the Proof from the database by ID.
+func (q ProofQ) DeleteByIDCtx(ctx context.Context, id int) error {
+	// delete with single primary key
+	sqlstr := `DELETE ` +
+		`FROM public.proofs ` +
+		`WHERE id = $1`
+	// run
+	if err := q.db.ExecRawContext(ctx, sqlstr, id); err != nil {
+		return errors.Wrap(err, "failed to exec delete stmt")
+	}
+	return nil
+}
+
+// DeleteByID deletes the Proof from the database by ID.
+func (q ProofQ) DeleteByID(id int) error {
+	return q.DeleteByIDCtx(context.Background(), id)
+}

@@ -38,7 +38,7 @@ func Run(args []string) {
 	migrateUpCmd := migrateCmd.Command("up", "migrate db up")
 	migrateDownCmd := migrateCmd.Command("down", "migrate db down")
 
-	cmd, err := app.Parse(args[1:])
+	cmd, err := app.Parse(args[1:3])
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse args"))
 	}
@@ -65,6 +65,14 @@ func Run(args []string) {
 
 	switch cmd {
 	case apiCmd.FullCommand():
+		servicesMap := make(map[string]bool)
+		for _, runner := range args[3:] {
+			servicesMap[runner] = true
+		}
+		cfg.SetConfig(config.SubServicesConfig{
+			ProofsCleaner: servicesMap["proofs-cleaner"],
+		})
+
 		cfg.Log().Info("starting API")
 		run(api.Run)
 	case migrateUpCmd.FullCommand():

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/rarimo/rarime-link-svc/internal/services/proofs_cleaner"
 	"gitlab.com/distributed_lab/logan/v3"
 	"time"
 
@@ -12,6 +13,16 @@ import (
 )
 
 func Run(ctx context.Context, cfg config.Config) {
+	if cfg.SubServicesConfig().ProofsCleaner {
+		log := cfg.Log().WithFields(logan.F{
+			"service": "proofs-cleaner",
+		})
+
+		proofsCleaner := proofs_cleaner.NewProofsCleaner(log, cfg.Storage(), cfg.LinkConfig(), cfg.RunningPeriodsConfig())
+		log.Info("starting proofs-cleaner")
+		go proofsCleaner.Run(ctx)
+	}
+
 	r := chi.NewRouter()
 
 	const slowRequestDurationThreshold = time.Second
@@ -32,6 +43,10 @@ func Run(ctx context.Context, cfg config.Config) {
 			})
 			r.Route("/{id}", func(r chi.Router) {
 				r.Get("/", handlers.ProofByID)
+			})
+			r.Route("/user/{user_did}", func(r chi.Router) {
+				r.Use(handlers.AuthMiddleware())
+				r.Get("/", handlers.ProofsByUserDID)
 			})
 		})
 	})

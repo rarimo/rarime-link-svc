@@ -13,6 +13,9 @@ type Config interface {
 	comfig.Logger
 	comfig.Listenerer
 	pgdb.Databaser
+	LinkConfiger
+	RunningPeriods
+	SubServices
 	Storage() data.Storage
 }
 
@@ -21,17 +24,35 @@ type config struct {
 	pgdb.Databaser
 	types.Copuser
 	comfig.Listenerer
+	LinkConfiger
+	RunningPeriods
+	SubServices
 
 	getter kv.Getter
 }
 
 func New(getter kv.Getter) Config {
 	return &config{
-		getter:     getter,
-		Listenerer: comfig.NewListenerer(getter),
-		Logger:     comfig.NewLogger(getter, comfig.LoggerOpts{}),
-		Databaser:  pgdb.NewDatabaser(getter),
+		getter:         getter,
+		Listenerer:     comfig.NewListenerer(getter),
+		Logger:         comfig.NewLogger(getter, comfig.LoggerOpts{}),
+		LinkConfiger:   NewLinkConfiger(getter),
+		RunningPeriods: NewRunningPeriods(getter),
+		SubServices:    NewSubServices(),
+		Databaser:      pgdb.NewDatabaser(getter),
 	}
+}
+
+func (c *config) Link() LinkConfig {
+	return c.LinkConfiger.LinkConfig()
+}
+
+func (c *config) RunningPeriod() RunningPeriodsConfig {
+	return c.RunningPeriods.RunningPeriodsConfig()
+}
+
+func (c *config) SubService() SubServicesConfig {
+	return c.SubServices.SubServicesConfig()
 }
 
 func (c *config) Storage() data.Storage {

@@ -5,6 +5,14 @@ log:
 listener:
   addr: :8000
 
+link:
+  max_expiration_time: 864000 # 10 days in seconds
+
+running_periods:
+  proofs_cleaner:
+    normal_period: 50m
+    min_abnormal_period: 50m
+    max_abnormal_period: 60m
+
 db:
   url: postgres://link:link@localhost:15432/link-db?sslmode=disable
-

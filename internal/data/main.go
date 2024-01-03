@@ -11,8 +11,11 @@ type Storage interface {
 }
 
 type ProofQ interface {
+	SelectAll() ([]*Proof, error)
 	ProofByIDCtx(ctx context.Context, id int, isForUpdate bool) (*Proof, error)
+	ProofsByUserDIDCtx(ctx context.Context, userDID string, isForUpdate bool) ([]Proof, error)
 	InsertCtx(ctx context.Context, p *Proof) error
+	DeleteByID(id int) error
 }
 
 type GorpMigrationQ interface {
