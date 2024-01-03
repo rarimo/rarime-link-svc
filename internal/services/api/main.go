@@ -13,15 +13,13 @@ import (
 )
 
 func Run(ctx context.Context, cfg config.Config) {
-	if cfg.SubServicesConfig().ProofsCleaner {
-		log := cfg.Log().WithFields(logan.F{
-			"service": "proofs-cleaner",
-		})
+	log := cfg.Log().WithFields(logan.F{
+		"service": "proofs-cleaner",
+	})
 
-		proofsCleaner := proofs_cleaner.NewProofsCleaner(log, cfg.Storage(), cfg.LinkConfig(), cfg.RunningPeriodsConfig())
-		log.Info("starting proofs-cleaner")
-		go proofsCleaner.Run(ctx)
-	}
+	proofsCleaner := proofs_cleaner.NewProofsCleaner(log, cfg.Storage(), cfg.LinkConfig(), cfg.RunningPeriodsConfig())
+	log.Info("starting proofs-cleaner")
+	go proofsCleaner.Run(ctx)
 
 	r := chi.NewRouter()
 

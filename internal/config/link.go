@@ -4,6 +4,8 @@ import (
 	"gitlab.com/distributed_lab/figure"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/kv"
+	"gitlab.com/tokend/keypair/figurekeypair"
+	"time"
 )
 
 type LinkConfiger interface {
@@ -22,7 +24,7 @@ type Link struct {
 }
 
 type LinkConfig struct {
-	MaxExpirationTime int `fig:"max_expiration_time,required"`
+	MaxExpirationTime time.Duration `fig:"max_expiration_time,required"`
 }
 
 func (e *Link) LinkConfig() LinkConfig {
@@ -31,6 +33,7 @@ func (e *Link) LinkConfig() LinkConfig {
 
 		err := figure.
 			Out(&result).
+			With(figure.BaseHooks, figurekeypair.Hooks).
 			From(kv.MustGetStringMap(e.getter, "link")).
 			Please()
 		if err != nil {

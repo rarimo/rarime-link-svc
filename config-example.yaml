@@ -6,7 +6,7 @@ listener:
   addr: :8000
 
 link:
-  max_expiration_time: 864000 # 10 days in seconds
+  max_expiration_time: 10h
 
 running_periods:
   proofs_cleaner:

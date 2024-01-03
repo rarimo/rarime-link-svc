@@ -26,7 +26,7 @@ func NewProofsCleaner(log *logan.Entry, storage data.Storage, cfg config.LinkCon
 }
 
 func (p ProofsCleaner) Run(ctx context.Context) {
-	go running.WithBackOff(
+	running.WithBackOff(
 		ctx, p.log, "proofs-cleaner",
 		p.clean,
 		p.proofsCleanerPeriods.NormalPeriod,
@@ -42,11 +42,9 @@ func (p ProofsCleaner) clean(_ context.Context) error {
 		return err
 	}
 
-	maxExpirationTime := time.Duration(p.cfg.MaxExpirationTime) * time.Second
-
 	for _, proof := range proofs {
-		if proof.CreatedAt.Add(maxExpirationTime).Before(time.Now()) {
-			err := p.storage.ProofQ().DeleteByID(proof.ID)
+		if proof.CreatedAt.Add(p.cfg.MaxExpirationTime).Before(time.Now()) {
+			err = p.storage.ProofQ().DeleteByID(proof.ID)
 			if err != nil {
 				return err
 			}

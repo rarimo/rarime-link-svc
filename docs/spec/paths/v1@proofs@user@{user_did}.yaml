@@ -15,6 +15,20 @@ get:
         example: "did:iden3:readonly:tM1QCJ7ytcbvLB7EFQhGsJPumc11DEE18gEvAzxE7"
   responses:
     '200':
+#      {
+#        "data": {
+#          "id": "1",
+#          "type": "proofs",
+#          "creator": "string",
+#          "base64_proofs": "string",
+#          "attributes": [
+#            {
+#              "created_at": "1702480643",
+#              "proof": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+#            }
+#          ]
+#        }
+#      }
       description: OK
       content:
         application/vnd.api+json:
@@ -22,17 +36,33 @@ get:
             type: object
             required:
               - data
-              - base64_proofs
             properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Proof'
-              base64_proofs:
-                type: string
-                description: >
-                  Base64 encoded string of user ID and proofs IDs
-                example: "eyJ1c2VyX2lkIjogIjEiLCAicHJvb2ZfaWQiOiAiMSJ9"
+                data:
+                    type: object
+                    required:
+                    - id
+                    - type
+                    - creator
+                    - base64_proofs
+                    - attributes
+                    properties:
+                      id:
+                          type: string
+                          example: "1"
+                      type:
+                          type: string
+                          example: "proofs"
+                      creator:
+                          type: string
+                          example: "string"
+                      base64_proofs:
+                          type: string
+                          example: "string"
+                      attributes:
+                          type: array
+                          items:
+                          $ref: '#/components/schemas/ProofsAttributes'
+
     400:
       $ref: '#/components/responses/invalidParameter'
     404:

@@ -17,10 +17,16 @@ type proofsByUserDIDRequest struct {
 	UserDid string
 }
 
+type proofsByUserDidData struct {
+	resources.Key
+	Creator      string                       `json:"creator"`
+	Base64Proofs string                       `json:"base64_proofs"`
+	Attributes   []resources.ProofsAttributes `json:"attributes"`
+}
+
 type proofsByUserDIDResponse struct {
-	Data         []resources.Proof  `json:"data"`
-	Include      resources.Included `json:"included"`
-	Base64Proofs string             `json:"base64_proofs"`
+	Data    proofsByUserDidData `json:"data"`
+	Include resources.Included  `json:"include"`
 }
 
 func newProofsByUserDIDRequest(r *http.Request) (proofsByUserDIDRequest, error) {
@@ -54,32 +60,22 @@ func ProofsByUserDID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourceProofs := make([]resources.Proof, len(proofs))
+	var response proofsByUserDIDResponse
 	proofIDs := make([]string, len(proofs))
 
 	for i, proof := range proofs {
-		resourceProofs[i] = resources.Proof{
-			Key: resources.Key{
-				ID:   strconv.FormatInt(int64(proof.ID), 10),
-				Type: resources.PROOFS,
-			},
-			Attributes: resources.ProofAttributes{
-				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
-				Creator:   proof.Creator,
-				Proof:     string(proof.Proof),
-			},
+		response.Data.Attributes[i] = resources.ProofsAttributes{
+			CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
+			Proof:     string(proof.Proof),
 		}
+
+		response.Data.Creator = proof.Creator
 		proofIDs[i] = strconv.FormatInt(int64(proof.ID), 10)
 	}
 
 	base64Data := req.UserDid + ":" + strings.Join(proofIDs, ",")
 	base64Proofs := base64.StdEncoding.EncodeToString([]byte(base64Data))
-
-	response := proofsByUserDIDResponse{
-		Data:         resourceProofs,
-		Base64Proofs: base64Proofs,
-		Include:      resources.Included{},
-	}
+	response.Data.Base64Proofs = base64Proofs
 
 	ape.Render(w, response)
 }
