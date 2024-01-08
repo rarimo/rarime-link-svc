@@ -71,9 +71,22 @@ type GorpMigration struct {
 
 // Proof represents a row from 'public.proofs'.
 type Proof struct {
-	ID        int       `db:"id" json:"id" structs:"-"`                          // id
+	ID        int       `db:"id" json:"id" structs:"id"`                          // id
 	Creator   string    `db:"creator" json:"creator" structs:"creator"`          // creator
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
+	Type      string    `db:"type" json:"type" structs:"type"`                   // type
+}
 
+// Link represents a row from 'public.links'.
+type Link struct {
+	ID        int       `db:"id" json:"id" structs:"id"`                         // id
+	Index     int       `db:"index" json:"index" structs:"index"`                // index
+	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
+}
+
+// LinkToProof represents a row from 'public.links_to_proofs'.
+type LinkToProof struct {
+	ID 		int `db:"id" json:"id" structs:"-"`                      // id
+	LinkID  int `db:"link_id" json:"link_id" structs:"link_id"`    // link_id
 }

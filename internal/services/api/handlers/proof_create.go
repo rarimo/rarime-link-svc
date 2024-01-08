@@ -26,6 +26,12 @@ func newProofCreateRequest(r *http.Request) (*resources.ProofCreate, error) {
 		}
 	}
 
+	if req.Type == "" {
+		return nil, validation.Errors{
+			"type": errors.New("type is required"),
+		}
+	}
+
 	return &req, nil
 }
 
@@ -40,6 +46,7 @@ func ProofCreate(w http.ResponseWriter, r *http.Request) {
 		Creator:   UserID(r),
 		CreatedAt: time.Now().UTC(),
 		Proof:     []byte(req.Proof),
+		Type:      req.Type,
 	}
 
 	err = Storage(r).ProofQ().InsertCtx(r.Context(), &proof)
@@ -59,6 +66,7 @@ func ProofCreate(w http.ResponseWriter, r *http.Request) {
 				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
+				Type:      proof.Type,
 			},
 		},
 		Included: resources.Included{},

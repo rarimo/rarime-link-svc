@@ -1,0 +1,19 @@
+allOf:
+  - $ref: '#/components/schemas/ProofKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - created_at
+          - base64_link
+        properties:
+          base64_link:
+            type: string
+            description: Base64 link to proofs
+          created_at:
+            type: string
+            description: The date and time when the proof was created in the timestamp format
+            example: '1702480643'

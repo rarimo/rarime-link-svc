@@ -36,14 +36,15 @@ func Run(ctx context.Context, cfg config.Config) {
 	r.Route("/v1", func(r chi.Router) {
 		r.Route("/proofs", func(r chi.Router) {
 			r.Group(func(r chi.Router) {
-				r.Use(handlers.AuthMiddleware())
+				//r.Use(handlers.AuthMiddleware())
 				r.Post("/", handlers.ProofCreate)
+				r.Post("/link", handlers.ProofLinkCreate)
 			})
 			r.Route("/{id}", func(r chi.Router) {
 				r.Get("/", handlers.ProofByID)
 			})
 			r.Route("/user/{user_did}", func(r chi.Router) {
-				r.Use(handlers.AuthMiddleware())
+				//r.Use(handlers.AuthMiddleware())
 				r.Get("/", handlers.ProofsByUserDID)
 			})
 		})

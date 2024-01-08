@@ -17,6 +17,10 @@ type Storage struct {
 	db *pgdb.DB
 }
 
+func (s *Storage) ProofLinkQ() data.ProofLinkQ {
+	return NewLinkQ(s.db)
+}
+
 // New - returns new instance of storage
 func New(db *pgdb.DB) *Storage {
 	return &Storage{
@@ -354,4 +358,177 @@ func (q ProofQ) DeleteByIDCtx(ctx context.Context, id int) error {
 // DeleteByID deletes the Proof from the database by ID.
 func (q ProofQ) DeleteByID(id int) error {
 	return q.DeleteByIDCtx(context.Background(), id)
+}
+
+
+// GetProofsByIDs retrieves all proofs for a given userDID from 'public.proofs'.
+func (q ProofQ) GetProofByID(proofIDs int) (data.Proof, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, creator, created_at, proof ` +
+		`FROM public.proofs ` +
+		`WHERE id = $1`
+	// run
+	var proof data.Proof
+	err := q.db.GetRaw(&proof, sqlstr, proofIDs)
+	if err != nil {
+		return proof, errors.Wrap(err, "failed to execute select")
+	}
+
+	return proof, nil
+}
+
+// LinkQ represents helper struct to access row of 'links'.
+type LinkQ struct {
+	db *pgdb.DB
+}
+
+// NewLinkQ  - creates new instance
+func NewLinkQ(db *pgdb.DB) LinkQ {
+	return LinkQ{
+		db,
+	}
+}
+
+// LinkQ  - creates new instance of LinkQ
+func (s Storage) LinkQ() data.ProofLinkQ {
+	return NewLinkQ(s.DB())
+}
+
+// InsertCtx inserts a Link to the database.
+func (q LinkQ) InsertCtx(ctx context.Context, l *data.Link) error {
+	// insert (primary key generated and returned by database)
+	sqlstr := `INSERT INTO public.links (` +
+		`id, index, created_at` +
+		`) VALUES (` +
+		`$1, $2, $3` +
+		`) RETURNING id`
+	// run
+	err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.Index, l.CreatedAt)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute insert")
+	}
+
+	return nil
+}
+
+// SelectAllCtx retrieves all rows from 'public.links'.
+func (q LinkQ) SelectAllCtx(ctx context.Context) ([]*data.Link, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, index, created_at ` +
+		`FROM public.links`
+	// run
+	var links []*data.Link
+	err := q.db.SelectRawContext(ctx, &links, sqlstr)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute select")
+	}
+
+	return links, nil
+}
+
+// SelectAll retrieves all rows from 'public.links'.
+func (q LinkQ) SelectAll() ([]*data.Link, error) {
+	return q.SelectAllCtx(context.Background())
+}
+
+// LinkToProofQ represents helper struct to access row of 'links_to_proofs'.
+type LinkToProofQ struct {
+	db *pgdb.DB
+}
+
+// NewLinkToProofQ  - creates new instance
+func NewLinkToProofQ(db *pgdb.DB) LinkToProofQ {
+	return LinkToProofQ{
+		db,
+	}
+}
+
+// LinkToProofQ  - creates new instance of LinkToProofQ
+func (s Storage) LinkToProofQ() data.LinkToProofQ {
+	return NewLinkToProofQ(s.DB())
+}
+
+// InsertCtx inserts a LinkToProof to the database.
+func (q LinkToProofQ) InsertCtx(ctx context.Context, l *data.LinkToProof) error {
+	// insert (primary key generated and returned by database)
+	sqlstr := `INSERT INTO public.links_to_proofs (` +
+		`link_id` +
+		`) VALUES (` +
+		`$1` +
+		`) RETURNING id`
+	// run
+
+	err := q.db.GetRawContext(ctx, &l.ID, sqlstr, l.LinkID)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute insert")
+	}
+
+	return nil
+}
+
+// SelectAllCtx retrieves all rows from 'public.links_to_proofs'.
+func (q LinkToProofQ) SelectAllCtx(ctx context.Context) ([]*data.LinkToProof, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, link_id ` +
+		`FROM public.links_to_proofs`
+	// run
+	var linkToProofs []*data.LinkToProof
+	err := q.db.SelectRawContext(ctx, &linkToProofs, sqlstr)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute select")
+	}
+
+	return linkToProofs, nil
+}
+
+// SelectAll retrieves all rows from 'public.links_to_proofs'.
+func (q LinkToProofQ) SelectAll() ([]*data.LinkToProof, error) {
+	return q.SelectAllCtx(context.Background())
+}
+
+// GetLastIndex retrieves the last index from 'public.links'.
+func (q LinkQ) GetLastIndex() (int, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`index ` +
+		`FROM public.links ` +
+		`ORDER BY index DESC LIMIT 1`
+	// run
+	var index int
+	err := q.db.GetRaw(&index, sqlstr)
+	if sql.ErrNoRows == err {
+		return -1, nil
+	}
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to execute select")
+	}
+
+	return index, nil
+}
+
+// Transaction begins a transaction on repo.
+func (q LinkQ) Transaction(fn func(db data.ProofLinkQ) error) error {
+	return q.db.Transaction(func() error{
+		return fn(q)
+	})
+}
+
+// GetProofsByIndex retrieves all proofs for a given userDID from 'public.proofs'.
+func (q LinkQ) GetProofsByIndex(index int) ([]data.Link, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, index, created_at ` +
+		`FROM public.links ` +
+		`WHERE index = $1`
+	// run
+	var links []data.Link
+	err := q.db.SelectRaw(&links, sqlstr, index)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute select")
+	}
+
+	return links, nil
 }

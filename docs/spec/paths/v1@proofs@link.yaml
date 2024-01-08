@@ -1,0 +1,45 @@
+post:
+  tags:
+    - Proofs
+  summary: Create Link Proof in base64
+  description: |
+    Add link to the specified proofs
+  operationId: createProofLink
+  security:
+    - Bearer: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: object
+              properties:
+                proofs_ids:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2, 3]
+              required:
+                - proofs_ids
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                $ref: '#/components/schemas/ProofLink'
+
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    401:
+      $ref: '#/components/responses/invalidAuth'
+    500:
+      $ref: '#/components/responses/internalError'
+

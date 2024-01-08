@@ -1,8 +1,12 @@
 type: object
 required:
   - proof
+  - type
 properties:
   proof:
     type: string
     description: The proof object in JSON string format
     example: "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+  type:
+    type: string
+    description: The type of the proof

@@ -56,6 +56,7 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
+				Type:      proof.Type,
 			},
 		},
 		Included: resources.Included{},

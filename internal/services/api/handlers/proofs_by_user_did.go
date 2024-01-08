@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/rarime-link-svc/resources"
@@ -10,23 +9,10 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type proofsByUserDIDRequest struct {
 	UserDid string
-}
-
-type proofsByUserDidData struct {
-	resources.Key
-	Creator      string                       `json:"creator"`
-	Base64Proofs string                       `json:"base64_proofs"`
-	Attributes   []resources.ProofsAttributes `json:"attributes"`
-}
-
-type proofsByUserDIDResponse struct {
-	Data    proofsByUserDidData `json:"data"`
-	Include resources.Included  `json:"include"`
 }
 
 func newProofsByUserDIDRequest(r *http.Request) (proofsByUserDIDRequest, error) {
@@ -60,22 +46,25 @@ func ProofsByUserDID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response proofsByUserDIDResponse
-	proofIDs := make([]string, len(proofs))
+	var response resources.ProofListResponse
 
-	for i, proof := range proofs {
-		response.Data.Attributes[i] = resources.ProofsAttributes{
-			CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
-			Proof:     string(proof.Proof),
+	for _, proof := range proofs {
+		proofResponse := resources.ProofResponse{
+			Data: resources.Proof{
+				Key: resources.Key{
+					ID:   strconv.FormatInt(int64(proof.ID), 10),
+					Type: resources.PROOFS,
+				},
+				Attributes: resources.ProofAttributes{
+					CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
+					Creator:   proof.Creator,
+					Proof:     string(proof.Proof),
+					Type:      proof.Type,
+				},
+			},
 		}
-
-		response.Data.Creator = proof.Creator
-		proofIDs[i] = strconv.FormatInt(int64(proof.ID), 10)
+		response.Data = append(response.Data, proofResponse.Data)
 	}
-
-	base64Data := req.UserDid + ":" + strings.Join(proofIDs, ",")
-	base64Proofs := base64.StdEncoding.EncodeToString([]byte(base64Data))
-	response.Data.Base64Proofs = base64Proofs
 
 	ape.Render(w, response)
 }
