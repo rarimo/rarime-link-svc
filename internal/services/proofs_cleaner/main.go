@@ -37,14 +37,34 @@ func (p ProofsCleaner) Run(ctx context.Context) {
 }
 
 func (p ProofsCleaner) clean(_ context.Context) error {
-	proofs, err := p.storage.ProofQ().SelectAll()
+	proofs, err := p.storage.ProofQ().SelectAllCtx(context.Background())
 	if err != nil {
 		return err
 	}
 
 	for _, proof := range proofs {
 		if proof.CreatedAt.Add(p.cfg.MaxExpirationTime).Before(time.Now()) {
-			err = p.storage.ProofQ().DeleteByID(proof.ID)
+			links, err := p.storage.LinksToProofQ().GetLinksToProofsByProofID(context.Background(), proof.ID)
+			if err != nil {
+				return err
+			}
+
+			if len(links) > 0 {
+				for _, link := range links {
+					err = p.storage.LinksToProofQ().Delete(link)
+					if err != nil {
+						return err
+					}
+					err = p.storage.LinkQ().Delete(&data.Link{
+						ID: link.LinkID,
+					})
+					if err != nil {
+						return err
+					}
+				}
+			}
+
+			err = p.storage.ProofQ().Delete(proof)
 			if err != nil {
 				return err
 			}

@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/rarimo/xo/types/xo"
+
+	"github.com/google/uuid"
 )
 
 // StringSlice is a slice of strings.
@@ -69,11 +71,27 @@ type GorpMigration struct {
 
 }
 
+// Link represents a row from 'public.links'.
+type Link struct {
+	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
+	UserID    string    `db:"user_id" json:"user_id" structs:"user_id"`          // user_id
+	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
+
+}
+
+// LinksToProof represents a row from 'public.links_to_proofs'.
+type LinksToProof struct {
+	LinkID  uuid.UUID `db:"link_id" json:"link_id" structs:"-"`   // link_id
+	ProofID uuid.UUID `db:"proof_id" json:"proof_id" structs:"-"` // proof_id
+
+}
+
 // Proof represents a row from 'public.proofs'.
 type Proof struct {
-	ID        int       `db:"id" json:"id" structs:"-"`                          // id
+	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
 	Creator   string    `db:"creator" json:"creator" structs:"creator"`          // creator
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
+	Type      string    `db:"type" json:"type" structs:"type"`                   // type
 
 }

@@ -6,10 +6,12 @@ package pg
 import (
 	"context"
 	"database/sql"
-	"github.com/rarimo/rarime-link-svc/internal/data"
 
 	"gitlab.com/distributed_lab/kit/pgdb"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+
+	"github.com/google/uuid"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 )
 
 // Storage is the helper struct for database operations
@@ -128,6 +130,151 @@ func (q GorpMigrationQ) DeleteCtx(ctx context.Context, gm *data.GorpMigration) e
 // Delete deletes the GorpMigration from the database.
 func (q GorpMigrationQ) Delete(gm *data.GorpMigration) error {
 	return q.DeleteCtx(context.Background(), gm)
+} // LinkQ represents helper struct to access row of 'links'.
+type LinkQ struct {
+	db *pgdb.DB
+}
+
+// NewLinkQ  - creates new instance
+func NewLinkQ(db *pgdb.DB) LinkQ {
+	return LinkQ{
+		db,
+	}
+}
+
+// LinkQ  - creates new instance of LinkQ
+func (s Storage) LinkQ() data.LinkQ {
+	return NewLinkQ(s.DB())
+}
+
+var colsLink = `id, user_id, created_at`
+
+// InsertCtx inserts a Link to the database.
+func (q LinkQ) InsertCtx(ctx context.Context, l *data.Link) error {
+	// sql insert query, primary key must be provided
+	sqlstr := `INSERT INTO public.links (` +
+		`id, user_id, created_at` +
+		`) VALUES (` +
+		`$1, $2, $3` +
+		`)`
+	// run
+	err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt)
+	return errors.Wrap(err, "failed to execute insert query")
+}
+
+// Insert insert a Link to the database.
+func (q LinkQ) Insert(l *data.Link) error {
+	return q.InsertCtx(context.Background(), l)
+}
+
+// UpdateCtx updates a Link in the database.
+func (q LinkQ) UpdateCtx(ctx context.Context, l *data.Link) error {
+	// update with composite primary key
+	sqlstr := `UPDATE public.links SET ` +
+		`user_id = $1 ` +
+		`WHERE id = $2`
+	// run
+	err := q.db.ExecRawContext(ctx, sqlstr, l.UserID, l.ID)
+	return errors.Wrap(err, "failed to execute update")
+}
+
+// Update updates a Link in the database.
+func (q LinkQ) Update(l *data.Link) error {
+	return q.UpdateCtx(context.Background(), l)
+}
+
+// UpsertCtx performs an upsert for Link.
+func (q LinkQ) UpsertCtx(ctx context.Context, l *data.Link) error {
+	// upsert
+	sqlstr := `INSERT INTO public.links (` +
+		`id, user_id, created_at` +
+		`) VALUES (` +
+		`$1, $2, $3` +
+		`)` +
+		` ON CONFLICT (id) DO ` +
+		`UPDATE SET ` +
+		`user_id = EXCLUDED.user_id `
+	// run
+	if err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt); err != nil {
+		return errors.Wrap(err, "failed to execute upsert stmt")
+	}
+	return nil
+}
+
+// Upsert performs an upsert for Link.
+func (q LinkQ) Upsert(l *data.Link) error {
+	return q.UpsertCtx(context.Background(), l)
+}
+
+// DeleteCtx deletes the Link from the database.
+func (q LinkQ) DeleteCtx(ctx context.Context, l *data.Link) error {
+	// delete with single primary key
+	sqlstr := `DELETE FROM public.links ` +
+		`WHERE id = $1`
+	// run
+	if err := q.db.ExecRawContext(ctx, sqlstr, l.ID); err != nil {
+		return errors.Wrap(err, "failed to exec delete stmt")
+	}
+	return nil
+}
+
+// Delete deletes the Link from the database.
+func (q LinkQ) Delete(l *data.Link) error {
+	return q.DeleteCtx(context.Background(), l)
+} // LinksToProofQ represents helper struct to access row of 'links_to_proofs'.
+type LinksToProofQ struct {
+	db *pgdb.DB
+}
+
+// NewLinksToProofQ  - creates new instance
+func NewLinksToProofQ(db *pgdb.DB) LinksToProofQ {
+	return LinksToProofQ{
+		db,
+	}
+}
+
+// LinksToProofQ  - creates new instance of LinksToProofQ
+func (s Storage) LinksToProofQ() data.LinksToProofQ {
+	return NewLinksToProofQ(s.DB())
+}
+
+var colsLinksToProof = `link_id, proof_id`
+
+// InsertCtx inserts a LinksToProof to the database.
+func (q LinksToProofQ) InsertCtx(ctx context.Context, ltp *data.LinksToProof) error {
+	// sql insert query, primary key must be provided
+	sqlstr := `INSERT INTO public.links_to_proofs (` +
+		`link_id, proof_id` +
+		`) VALUES (` +
+		`$1, $2` +
+		`)`
+	// run
+	err := q.db.ExecRawContext(ctx, sqlstr, ltp.LinkID, ltp.ProofID)
+	return errors.Wrap(err, "failed to execute insert query")
+}
+
+// Insert insert a LinksToProof to the database.
+func (q LinksToProofQ) Insert(ltp *data.LinksToProof) error {
+	return q.InsertCtx(context.Background(), ltp)
+}
+
+// ------ NOTE: Update statements omitted due to lack of fields other than primary key ------
+
+// DeleteCtx deletes the LinksToProof from the database.
+func (q LinksToProofQ) DeleteCtx(ctx context.Context, ltp *data.LinksToProof) error {
+	// delete with composite primary key
+	sqlstr := `DELETE FROM public.links_to_proofs ` +
+		`WHERE link_id = $1 AND proof_id = $2`
+	// run
+	if err := q.db.ExecRawContext(ctx, sqlstr, ltp.LinkID, ltp.ProofID); err != nil {
+		return errors.Wrap(err, "failed to exec delete stmt")
+	}
+	return nil
+}
+
+// Delete deletes the LinksToProof from the database.
+func (q LinksToProofQ) Delete(ltp *data.LinksToProof) error {
+	return q.DeleteCtx(context.Background(), ltp)
 } // ProofQ represents helper struct to access row of 'proofs'.
 type ProofQ struct {
 	db *pgdb.DB
@@ -145,24 +292,19 @@ func (s Storage) ProofQ() data.ProofQ {
 	return NewProofQ(s.DB())
 }
 
-var colsProof = `id, creator, created_at, proof`
+var colsProof = `id, creator, created_at, proof, type`
 
 // InsertCtx inserts a Proof to the database.
 func (q ProofQ) InsertCtx(ctx context.Context, p *data.Proof) error {
-	// insert (primary key generated and returned by database)
+	// sql insert query, primary key must be provided
 	sqlstr := `INSERT INTO public.proofs (` +
-		`creator, created_at, proof` +
+		`id, creator, created_at, proof, type` +
 		`) VALUES (` +
-		`$1, $2, $3` +
-		`) RETURNING id`
-		// run
-
-	err := q.db.GetRawContext(ctx, &p.ID, sqlstr, p.Creator, p.CreatedAt, p.Proof)
-	if err != nil {
-		return errors.Wrap(err, "failed to execute insert")
-	}
-
-	return nil
+		`$1, $2, $3, $4, $5` +
+		`)`
+	// run
+	err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.Type)
+	return errors.Wrap(err, "failed to execute insert query")
 }
 
 // Insert insert a Proof to the database.
@@ -174,10 +316,10 @@ func (q ProofQ) Insert(p *data.Proof) error {
 func (q ProofQ) UpdateCtx(ctx context.Context, p *data.Proof) error {
 	// update with composite primary key
 	sqlstr := `UPDATE public.proofs SET ` +
-		`creator = $1, proof = $2 ` +
-		`WHERE id = $3`
+		`creator = $1, proof = $2, type = $3 ` +
+		`WHERE id = $4`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, p.Creator, p.Proof, p.ID)
+	err := q.db.ExecRawContext(ctx, sqlstr, p.Creator, p.Proof, p.Type, p.ID)
 	return errors.Wrap(err, "failed to execute update")
 }
 
@@ -190,15 +332,15 @@ func (q ProofQ) Update(p *data.Proof) error {
 func (q ProofQ) UpsertCtx(ctx context.Context, p *data.Proof) error {
 	// upsert
 	sqlstr := `INSERT INTO public.proofs (` +
-		`id, creator, created_at, proof` +
+		`id, creator, created_at, proof, type` +
 		`) VALUES (` +
-		`$1, $2, $3, $4` +
+		`$1, $2, $3, $4, $5` +
 		`)` +
 		` ON CONFLICT (id) DO ` +
 		`UPDATE SET ` +
-		`creator = EXCLUDED.creator, proof = EXCLUDED.proof `
+		`creator = EXCLUDED.creator, proof = EXCLUDED.proof, type = EXCLUDED.type `
 	// run
-	if err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof); err != nil {
+	if err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.Type); err != nil {
 		return errors.Wrap(err, "failed to execute upsert stmt")
 	}
 	return nil
@@ -259,13 +401,79 @@ func (q GorpMigrationQ) GorpMigrationByID(id string, isForUpdate bool) (*data.Go
 	return q.GorpMigrationByIDCtx(context.Background(), id, isForUpdate)
 }
 
+// LinkByIDCtx retrieves a row from 'public.links' as a Link.
+//
+// Generated from index 'links_pkey'.
+func (q LinkQ) LinkByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Link, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, user_id, created_at ` +
+		`FROM public.links ` +
+		`WHERE id = $1`
+	// run
+	if isForUpdate {
+		sqlstr += " for update"
+	}
+	var res data.Link
+	err := q.db.GetRawContext(ctx, &res, sqlstr, id)
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, errors.Wrap(err, "failed to exec select")
+	}
+
+	return &res, nil
+}
+
+// LinkByID retrieves a row from 'public.links' as a Link.
+//
+// Generated from index 'links_pkey'.
+func (q LinkQ) LinkByID(id uuid.UUID, isForUpdate bool) (*data.Link, error) {
+	return q.LinkByIDCtx(context.Background(), id, isForUpdate)
+}
+
+// LinksToProofByLinkIDProofIDCtx retrieves a row from 'public.links_to_proofs' as a LinksToProof.
+//
+// Generated from index 'links_to_proofs_pkey'.
+func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`link_id, proof_id ` +
+		`FROM public.links_to_proofs ` +
+		`WHERE link_id = $1 AND proof_id = $2`
+	// run
+	if isForUpdate {
+		sqlstr += " for update"
+	}
+	var res data.LinksToProof
+	err := q.db.GetRawContext(ctx, &res, sqlstr, linkID, proofID)
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, errors.Wrap(err, "failed to exec select")
+	}
+
+	return &res, nil
+}
+
+// LinksToProofByLinkIDProofID retrieves a row from 'public.links_to_proofs' as a LinksToProof.
+//
+// Generated from index 'links_to_proofs_pkey'.
+func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
+	return q.LinksToProofByLinkIDProofIDCtx(context.Background(), linkID, proofID, isForUpdate)
+}
+
 // ProofByIDCtx retrieves a row from 'public.proofs' as a Proof.
 //
 // Generated from index 'proofs_pkey'.
-func (q ProofQ) ProofByIDCtx(ctx context.Context, id int, isForUpdate bool) (*data.Proof, error) {
+func (q ProofQ) ProofByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Proof, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, creator, created_at, proof ` +
+		`id, creator, created_at, proof, type ` +
 		`FROM public.proofs ` +
 		`WHERE id = $1`
 	// run
@@ -288,70 +496,6 @@ func (q ProofQ) ProofByIDCtx(ctx context.Context, id int, isForUpdate bool) (*da
 // ProofByID retrieves a row from 'public.proofs' as a Proof.
 //
 // Generated from index 'proofs_pkey'.
-func (q ProofQ) ProofByID(id int, isForUpdate bool) (*data.Proof, error) {
+func (q ProofQ) ProofByID(id uuid.UUID, isForUpdate bool) (*data.Proof, error) {
 	return q.ProofByIDCtx(context.Background(), id, isForUpdate)
-}
-
-// ProofsByUserDIDCtx retrieves all proofs for a given userDID from 'public.proofs'.
-func (q ProofQ) ProofsByUserDIDCtx(ctx context.Context, userDID string, isForUpdate bool) ([]data.Proof, error) {
-	// query
-	sqlstr := `SELECT ` +
-		`id, creator, created_at, proof ` +
-		`FROM public.proofs ` +
-		`WHERE creator = $1`
-	// run
-	if isForUpdate {
-		sqlstr += " for update"
-	}
-	var proofs []data.Proof
-	err := q.db.SelectRawContext(ctx, &proofs, sqlstr, userDID)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to execute select")
-	}
-
-	return proofs, nil
-}
-
-// ProofsByUserDID retrieves all proofs for a given userDID from 'public.proofs'.
-func (q ProofQ) ProofsByUserDID(userDID string, isForUpdate bool) ([]data.Proof, error) {
-	return q.ProofsByUserDIDCtx(context.Background(), userDID, isForUpdate)
-}
-
-// SelectAllCtx retrieves all rows from 'public.proofs'.
-func (q ProofQ) SelectAllCtx(ctx context.Context) ([]*data.Proof, error) {
-	// query
-	sqlstr := `SELECT ` +
-		`id, creator, created_at, proof ` +
-		`FROM public.proofs`
-	// run
-	var proofs []*data.Proof
-	err := q.db.SelectRawContext(ctx, &proofs, sqlstr)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to execute select")
-	}
-
-	return proofs, nil
-}
-
-// SelectAll retrieves all rows from 'public.proofs'.
-func (q ProofQ) SelectAll() ([]*data.Proof, error) {
-	return q.SelectAllCtx(context.Background())
-}
-
-// DeleteCtx deletes the Proof from the database by ID.
-func (q ProofQ) DeleteByIDCtx(ctx context.Context, id int) error {
-	// delete with single primary key
-	sqlstr := `DELETE ` +
-		`FROM public.proofs ` +
-		`WHERE id = $1`
-	// run
-	if err := q.db.ExecRawContext(ctx, sqlstr, id); err != nil {
-		return errors.Wrap(err, "failed to exec delete stmt")
-	}
-	return nil
-}
-
-// DeleteByID deletes the Proof from the database by ID.
-func (q ProofQ) DeleteByID(id int) error {
-	return q.DeleteByIDCtx(context.Background(), id)
 }
