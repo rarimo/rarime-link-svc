@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/rarime-link-svc/resources"
@@ -33,7 +34,7 @@ func ProofsLinkByUserDID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proofsLinks, err := Storage(r).ProofLinkQ().GetProofsByUserDID(req.UserDid)
+	proofsLinks, err := Storage(r).LinkQ().GetProofsLinksByUserID(context.Background(), req.UserDid)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get proofs")
 		ape.RenderErr(w, problems.InternalError())

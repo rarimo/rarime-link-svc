@@ -41,11 +41,11 @@ func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
 	linkID := uuid.New()
 
 	var proofs []data.Proof
-	err = Storage(r).LinkQ().Transaction(func(q data.ProofLinkQ) error {
+	err = Storage(r).LinkQ().Transaction(func(q data.LinkQ) error {
 
-		err = q.InsertCtx(r.Context(), &data.Link{
+		err = q.Insert(&data.Link{
 			ID:        linkID,
-			UserID:    UserID(r),
+			UserID:    "user_did",
 			CreatedAt: timestamp,
 		})
 		if err != nil {
@@ -54,15 +54,15 @@ func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, proofID := range req.Data.ProofsIds {
-			p, err := Storage(r).ProofQ().GetProofByID(proofID)
+			p, err := Storage(r).ProofQ().ProofByID(proofID, false)
 			if err != nil {
 				ape.RenderErr(w, problems.InternalError())
 				return err
 			}
 
-			proofs = append(proofs, p)
+			proofs = append(proofs, *p)
 
-			err = q.InsertCtxLinkToProof(r.Context(), &data.LinkToProof{
+			err = q.InsertCtxLinkToProof(r.Context(), data.LinksToProof{
 				LinkID:  linkID,
 				ProofID: proofID,
 			})

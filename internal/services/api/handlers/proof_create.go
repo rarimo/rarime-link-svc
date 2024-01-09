@@ -55,7 +55,7 @@ func ProofCreate(w http.ResponseWriter, r *http.Request) {
 		Type:      req.Data.Type,
 	}
 
-	err = Storage(r).ProofQ().InsertCtx(r.Context(), &proof)
+	err = Storage(r).ProofQ().Insert(&proof)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to create proof")
 		ape.RenderErr(w, problems.InternalError())

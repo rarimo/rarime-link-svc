@@ -1,5 +1,10 @@
 package data
 
+import (
+	"context"
+	"github.com/google/uuid"
+)
+
 //go:generate xo schema "postgres://link:link@localhost:15432/link-db?sslmode=disable" -o ./ --single=schema.xo.go --src templates
 //go:generate xo schema "postgres://link:link@localhost:15432/link-db?sslmode=disable" -o pg --single=schema.xo.go --src=pg/templates --go-context=both
 //go:generate goimports -w ./
@@ -12,29 +17,34 @@ type Storage interface {
 }
 
 type ProofQ interface {
-	// FIXME
-	//SelectAll() ([]*Proof, error)
-	//GetProofByID(proofID uuid.UUID) (Proof, error)
-	//ProofByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*Proof, error)
-	//ProofsByUserDIDCtx(ctx context.Context, userDID string, isForUpdate bool) ([]Proof, error)
-	//InsertCtx(ctx context.Context, p *Proof) error
-	//DeleteByID(id uuid.UUID) error
+	SelectAllCtx(ctx context.Context) ([]*Proof, error)
+	ProofByID(proofID uuid.UUID, isForUpdate bool) (*Proof, error)
+	Insert(p *Proof) error
+	Update(p *Proof) error
+	Upsert(p *Proof) error
+	Delete(p *Proof) error
+	ProofsByUserDIDCtx(ctx context.Context, userDID string) ([]Proof, error)
 }
 
 type LinkQ interface {
-	// FIXME
-	//SelectAll() ([]*Link, error)
-	//GetProofsByUserDID(userDID string) ([]Link, error)
-	//InsertCtx(ctx context.Context, l *Link) error
-	//InsertCtxLinkToProof(ctx context.Context, l *LinksToProof) error
-	//Transaction(fn func(db LinkQ) error) error
+	Insert(l *Link) error
+	Update(l *Link) error
+	Upsert(l *Link) error
+	Delete(l *Link) error
+	SelectAllCtx(ctx context.Context) ([]*Link, error)
+	LinkByID(id uuid.UUID, isForUpdate bool) (*Link, error)
+	Transaction(fn func(db LinkQ) error) error
+	InsertCtxLinkToProof(ctx context.Context, linksToProof LinksToProof) error
+	GetProofsLinksByUserID(ctx context.Context, userID string) ([]*Link, error)
 }
 
 type LinksToProofQ interface {
-	// FIXME
-	//SelectAll() ([]*LinksToProof, error)
-	//GetProofsByLinkID(linkID uuid.UUID) ([]LinksToProof, error)
-	//InsertCtx(ctx context.Context, l *LinksToProof) error
+	Insert(l *LinksToProof) error
+	Delete(l *LinksToProof) error
+	LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID, proofID uuid.UUID, isForUpdate bool) (*LinksToProof, error)
+	SelectAllCtx(ctx context.Context) ([]*LinksToProofQ, error)
+	GetLinksToProofsByLinkID(ctx context.Context, linkID uuid.UUID) ([]*LinksToProof, error)
+	GetLinksToProofsByProofID(ctx context.Context, proofID uuid.UUID) ([]*LinksToProof, error)
 }
 
 type GorpMigrationQ interface {

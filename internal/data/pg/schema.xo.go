@@ -7,12 +7,11 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/rarimo/rarime-link-svc/internal/data"
-
 	"gitlab.com/distributed_lab/kit/pgdb"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 
 	"github.com/google/uuid"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 )
 
 // Storage is the helper struct for database operations

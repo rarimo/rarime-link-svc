@@ -35,7 +35,7 @@ func ProofLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proofs, err := Storage(r).LinkToProofQ().GetProofsByLinkID(req.LinkID)
+	proofs, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), req.LinkID)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get link to proofs")
 		ape.RenderErr(w, problems.InternalError())
@@ -50,7 +50,7 @@ func ProofLinkByID(w http.ResponseWriter, r *http.Request) {
 
 	var response resources.ProofLinkByIdListResponse
 	for _, proof := range proofs {
-		proof, err := Storage(r).ProofQ().GetProofByID(proof.ProofID)
+		proof, err := Storage(r).ProofQ().ProofByID(proof.ProofID, false)
 		if err != nil {
 			Log(r).WithError(err).Error("failed to get proof")
 			ape.RenderErr(w, problems.InternalError())

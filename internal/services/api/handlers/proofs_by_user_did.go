@@ -33,7 +33,7 @@ func ProofsByUserDID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proofs, err := Storage(r).ProofQ().ProofsByUserDIDCtx(r.Context(), req.UserDid, false)
+	proofs, err := Storage(r).ProofQ().ProofsByUserDIDCtx(r.Context(), req.UserDid)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get proofs")
 		ape.RenderErr(w, problems.InternalError())

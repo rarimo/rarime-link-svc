@@ -34,7 +34,7 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proof, err := Storage(r).ProofQ().ProofByIDCtx(r.Context(), req.ID, false)
+	proof, err := Storage(r).ProofQ().ProofByID(req.ID, false)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get proof")
 		ape.RenderErr(w, problems.InternalError())
