@@ -123,11 +123,148 @@
         }
       }
     },
+    "/v1/proofs/link": {
+      "post": {
+        "tags": [
+          "Proofs"
+        ],
+        "summary": "Create Link Proofs",
+        "description": "Add link to the specified proofs\n",
+        "operationId": "createProofsLink",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "proofs_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "550e8400-e29b-41d4-a716-446655440001",
+                          "550e8400-e29b-41d4-a716-446655440002",
+                          "550e8400-e29b-41d4-a716-446655440003"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "proofs_ids"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ProofLink"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidAuth"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/v1/proofs/link/{link_id}": {
+      "get": {
+        "summary": "Get Proofs by Link ID",
+        "description": "Returns information about the all proofs of the link.\n",
+        "operationId": "proofsByLinkID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Proofs"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "description": "The Link ID",
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Proof"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
     "/v1/proofs/user/{user_did}": {
       "get": {
         "summary": "Get Proofs by User DID",
         "description": "Returns information about the all proofs of the user.\n",
         "operationId": "proofByUserDID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "tags": [
           "Proofs"
         ],
@@ -155,36 +292,68 @@
                   ],
                   "properties": {
                     "data": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "type",
-                        "creator",
-                        "base64_proofs",
-                        "attributes"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "1"
-                        },
-                        "type": {
-                          "type": "string",
-                          "example": "proofs"
-                        },
-                        "creator": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "base64_proofs": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "attributes": {
-                          "type": "array",
-                          "items": null,
-                          "$ref": "#/components/schemas/ProofsAttributes"
-                        }
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Proof"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      }
+    },
+    "/v1/proofs/user/{user_did}/link": {
+      "get": {
+        "summary": "Get Proofs Links by User DID",
+        "description": "Returns information about the all links of the user.\n",
+        "operationId": "proofsLinksByUserDID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Proofs"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_did",
+            "required": true,
+            "description": "The User DID",
+            "schema": {
+              "type": "string",
+              "example": "did:iden3:readonly:tM1QCJ7ytcbvLB7EFQhGsJPumc11DEE18gEvAzxE7"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProofLink"
                       }
                     }
                   }
@@ -285,7 +454,8 @@
                 "required": [
                   "creator",
                   "created_at",
-                  "proof"
+                  "proof",
+                  "type"
                 ],
                 "properties": {
                   "creator": {
@@ -301,6 +471,10 @@
                     "type": "string",
                     "description": "The proof object in JSON string format",
                     "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "The type of the proof"
                   }
                 }
               }
@@ -311,13 +485,18 @@
       "ProofCreate": {
         "type": "object",
         "required": [
-          "proof"
+          "proof",
+          "type"
         ],
         "properties": {
           "proof": {
             "type": "string",
             "description": "The proof object in JSON string format",
             "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of the proof"
           }
         }
       },
@@ -330,7 +509,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "1"
+            "example": "550e8400-e29b-41d4-a716-446655440000"
           },
           "type": {
             "type": "string",
@@ -340,24 +519,39 @@
           }
         }
       },
-      "ProofsAttributes": {
-        "type": "object",
-        "required": [
-          "created_at",
-          "proof"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string",
-            "description": "The date and time when the proof was created in the timestamp format",
-            "example": "1702480643"
+      "ProofLink": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProofKey"
           },
-          "proof": {
-            "type": "string",
-            "description": "The proof object in JSON string format",
-            "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
+          {
+            "type": "object",
+            "required": [
+              "attributes"
+            ],
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "created_at",
+                  "link"
+                ],
+                "properties": {
+                  "link": {
+                    "type": "string",
+                    "description": "UUID Link to proofs",
+                    "example": "05260b49-2c35-48b9-8300-d39ae48ca312"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "description": "The date and time when the proof was created in the timestamp format",
+                    "example": "1702480643"
+                  }
+                }
+              }
+            }
           }
-        }
+        ]
       }
     },
     "responses": {
