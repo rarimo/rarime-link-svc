@@ -1,20 +1,19 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"net/http"
-	"strconv"
 	"time"
 )
 
 type ProofLink struct {
-	ProofsIds []int `json:"proofs_ids"`
+	ProofsIds []uuid.UUID `json:"proofs_ids"`
 }
 
 type ProofLinkRequest struct {
@@ -38,59 +37,49 @@ func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lastIndex, err := Storage(r).ProofLinkQ().GetLastIndex()
-	if err != nil {
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	index := lastIndex + 1
 	timestamp := time.Now().UTC()
+	linkID := uuid.New()
 
 	var proofs []data.Proof
-	for _, proof := range req.Data.ProofsIds {
-		p, err := Storage(r).ProofQ().GetProofByID(proof)
+	err = Storage(r).ProofLinkQ().Transaction(func(q data.ProofLinkQ) error {
+
+		err = q.InsertCtx(r.Context(), &data.Link{
+			ID:        linkID,
+			UserID:    UserID(r),
+			CreatedAt: timestamp,
+		})
 		if err != nil {
 			ape.RenderErr(w, problems.InternalError())
-			return
+			return err
 		}
-		proofs = append(proofs, p)
-	}
 
-	if len(proofs) != len(req.Data.ProofsIds) {
-		ape.RenderErr(w, problems.BadRequest(errors.New("proofs not found"))...)
-		return
-	}
-
-	var proofsIDs string
-
-	err = Storage(r).ProofLinkQ().Transaction(func(q data.ProofLinkQ) error {
-		for _, proof := range req.Data.ProofsIds {
-			err = q.InsertCtx(r.Context(), &data.Link{
-				ID:        proof,
-				Index:     index,
-				CreatedAt: timestamp,
-			})
+		for _, proofID := range req.Data.ProofsIds {
+			p, err := Storage(r).ProofQ().GetProofByID(proofID)
 			if err != nil {
+				ape.RenderErr(w, problems.InternalError())
 				return err
 			}
-			proofsIDs += strconv.Itoa(proof) + ","
+
+			proofs = append(proofs, p)
+
+			err = q.InsertCtxLinkToProof(r.Context(), &data.LinkToProof{
+				LinkID:  linkID,
+				ProofID: proofID,
+			})
+			if err != nil {
+				ape.RenderErr(w, problems.InternalError())
+				return err
+			}
 		}
-		// remove last comma
-		proofsIDs = proofsIDs[:len(proofsIDs)-1]
+
+		if len(proofs) != len(req.Data.ProofsIds) {
+			ape.RenderErr(w, problems.BadRequest(errors.New("proofs not found"))...)
+			return errors.New("proofs not found")
+		}
 
 		return nil
 	})
-	if err != nil {
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
 
-	base64Link := base64.StdEncoding.EncodeToString([]byte(proofsIDs))
-
-	err = Storage(r).LinkToProofQ().InsertCtx(r.Context(), &data.LinkToProof{
-		LinkID: index,
-	})
 	if err != nil {
 		ape.RenderErr(w, problems.InternalError())
 		return
@@ -99,12 +88,11 @@ func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, resources.ProofLinkResponse{
 		Data: resources.ProofLink{
 			Key: resources.Key{
-				ID:   strconv.Itoa(index),
 				Type: resources.PROOFS,
 			},
 			Attributes: resources.ProofLinkAttributes{
-				Base64Link: base64Link,
-				CreatedAt:  timestamp.String(),
+				Link:      linkID.String(),
+				CreatedAt: timestamp.String(),
 			},
 		},
 		Included: resources.Included{},

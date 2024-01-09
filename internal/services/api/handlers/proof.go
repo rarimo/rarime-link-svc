@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/google/uuid"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -12,11 +13,11 @@ import (
 )
 
 type proofByIDRequest struct {
-	ID int
+	ID uuid.UUID
 }
 
 func newProofByIDRequest(r *http.Request) (*proofByIDRequest, error) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert id to int")
 	}
@@ -49,7 +50,7 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, resources.ProofResponse{
 		Data: resources.Proof{
 			Key: resources.Key{
-				ID:   strconv.FormatInt(int64(proof.ID), 10),
+				ID:   proof.ID.String(),
 				Type: resources.PROOFS,
 			},
 			Attributes: resources.ProofAttributes{

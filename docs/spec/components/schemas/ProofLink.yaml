@@ -8,11 +8,12 @@ allOf:
         type: object
         required:
           - created_at
-          - base64_link
+          - link
         properties:
-          base64_link:
+          link:
             type: string
-            description: Base64 link to proofs
+            description: UUID Link to proofs
+            example: '05260b49-2c35-48b9-8300-d39ae48ca312'
           created_at:
             type: string
             description: The date and time when the proof was created in the timestamp format

@@ -11,59 +11,58 @@ import (
 	"strconv"
 )
 
-type proofsByUserDIDRequest struct {
+type proofsLinksByUserDIDRequest struct {
 	UserDid string
 }
 
-func newProofsByUserDIDRequest(r *http.Request) (proofsByUserDIDRequest, error) {
+func newProofLinkByUserDIDRequest(r *http.Request) (proofsLinksByUserDIDRequest, error) {
 	userDid := chi.URLParam(r, "user_did")
 	if userDid == "" {
-		return proofsByUserDIDRequest{}, errors.New("user_did is required")
+		return proofsLinksByUserDIDRequest{}, errors.New("user_did is required")
 	}
 
-	return proofsByUserDIDRequest{userDid}, validation.Errors{
+	return proofsLinksByUserDIDRequest{userDid}, validation.Errors{
 		"user_did": validation.Validate(userDid, validation.Required),
 	}.Filter()
 }
 
-func ProofsByUserDID(w http.ResponseWriter, r *http.Request) {
-	req, err := newProofsByUserDIDRequest(r)
+func ProofsLinkByUserDID(w http.ResponseWriter, r *http.Request) {
+	req, err := newProofLinkByUserDIDRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	proofs, err := Storage(r).ProofQ().ProofsByUserDIDCtx(r.Context(), req.UserDid, false)
+	proofsLinks, err := Storage(r).ProofLinkQ().GetProofsByUserDID(req.UserDid)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get proofs")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	if proofs == nil {
+	if proofsLinks == nil {
 		Log(r).WithField("user_did", req.UserDid).Warn("proofs not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
-	var response resources.ProofListResponse
+	var response resources.ProofLinkListResponse
 
-	for _, proof := range proofs {
-		proofResponse := resources.ProofResponse{
-			Data: resources.Proof{
+	for _, link := range proofsLinks {
+		linkResponse := resources.ProofLinkResponse{
+			Data: resources.ProofLink{
 				Key: resources.Key{
-					ID:   proof.ID.String(),
+					ID:   link.ID.String(),
 					Type: resources.PROOFS,
 				},
-				Attributes: resources.ProofAttributes{
-					CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
-					Creator:   proof.Creator,
-					Proof:     string(proof.Proof),
-					Type:      proof.Type,
+				Attributes: resources.ProofLinkAttributes{
+					CreatedAt: strconv.FormatInt(link.CreatedAt.Unix(), 10),
+					Link:      link.ID.String(),
 				},
 			},
 		}
-		response.Data = append(response.Data, proofResponse.Data)
+
+		response.Data = append(response.Data, linkResponse.Data)
 	}
 
 	ape.Render(w, response)

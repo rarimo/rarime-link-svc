@@ -6,6 +6,7 @@ package pg
 import (
 	"context"
 	"database/sql"
+	"github.com/google/uuid"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 
 	"gitlab.com/distributed_lab/kit/pgdb"
@@ -155,13 +156,13 @@ var colsProof = `id, creator, created_at, proof`
 func (q ProofQ) InsertCtx(ctx context.Context, p *data.Proof) error {
 	// insert (primary key generated and returned by database)
 	sqlstr := `INSERT INTO public.proofs (` +
-		`creator, created_at, proof` +
+		`id, creator, created_at, proof` +
 		`) VALUES (` +
 		`$1, $2, $3` +
 		`) RETURNING id`
 		// run
 
-	err := q.db.GetRawContext(ctx, &p.ID, sqlstr, p.Creator, p.CreatedAt, p.Proof)
+	err := q.db.GetRawContext(ctx, &p.ID, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute insert")
 	}
@@ -266,7 +267,7 @@ func (q GorpMigrationQ) GorpMigrationByID(id string, isForUpdate bool) (*data.Go
 // ProofByIDCtx retrieves a row from 'public.proofs' as a Proof.
 //
 // Generated from index 'proofs_pkey'.
-func (q ProofQ) ProofByIDCtx(ctx context.Context, id int, isForUpdate bool) (*data.Proof, error) {
+func (q ProofQ) ProofByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Proof, error) {
 	// query
 	sqlstr := `SELECT ` +
 		`id, creator, created_at, proof ` +
@@ -292,7 +293,7 @@ func (q ProofQ) ProofByIDCtx(ctx context.Context, id int, isForUpdate bool) (*da
 // ProofByID retrieves a row from 'public.proofs' as a Proof.
 //
 // Generated from index 'proofs_pkey'.
-func (q ProofQ) ProofByID(id int, isForUpdate bool) (*data.Proof, error) {
+func (q ProofQ) ProofByID(id uuid.UUID, isForUpdate bool) (*data.Proof, error) {
 	return q.ProofByIDCtx(context.Background(), id, isForUpdate)
 }
 
@@ -343,7 +344,7 @@ func (q ProofQ) SelectAll() ([]*data.Proof, error) {
 }
 
 // DeleteCtx deletes the Proof from the database by ID.
-func (q ProofQ) DeleteByIDCtx(ctx context.Context, id int) error {
+func (q ProofQ) DeleteByIDCtx(ctx context.Context, id uuid.UUID) error {
 	// delete with single primary key
 	sqlstr := `DELETE ` +
 		`FROM public.proofs ` +
@@ -356,13 +357,13 @@ func (q ProofQ) DeleteByIDCtx(ctx context.Context, id int) error {
 }
 
 // DeleteByID deletes the Proof from the database by ID.
-func (q ProofQ) DeleteByID(id int) error {
+func (q ProofQ) DeleteByID(id uuid.UUID) error {
 	return q.DeleteByIDCtx(context.Background(), id)
 }
 
 
 // GetProofsByIDs retrieves all proofs for a given userDID from 'public.proofs'.
-func (q ProofQ) GetProofByID(proofIDs int) (data.Proof, error) {
+func (q ProofQ) GetProofByID(proofID uuid.UUID) (data.Proof, error) {
 	// query
 	sqlstr := `SELECT ` +
 		`id, creator, created_at, proof ` +
@@ -370,7 +371,7 @@ func (q ProofQ) GetProofByID(proofIDs int) (data.Proof, error) {
 		`WHERE id = $1`
 	// run
 	var proof data.Proof
-	err := q.db.GetRaw(&proof, sqlstr, proofIDs)
+	err := q.db.GetRaw(&proof, sqlstr, proofID)
 	if err != nil {
 		return proof, errors.Wrap(err, "failed to execute select")
 	}
@@ -399,12 +400,12 @@ func (s Storage) LinkQ() data.ProofLinkQ {
 func (q LinkQ) InsertCtx(ctx context.Context, l *data.Link) error {
 	// insert (primary key generated and returned by database)
 	sqlstr := `INSERT INTO public.links (` +
-		`id, index, created_at` +
+		`id, user_id, created_at` +
 		`) VALUES (` +
 		`$1, $2, $3` +
 		`) RETURNING id`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.Index, l.CreatedAt)
+	err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute insert")
 	}
@@ -416,8 +417,8 @@ func (q LinkQ) InsertCtx(ctx context.Context, l *data.Link) error {
 func (q LinkQ) SelectAllCtx(ctx context.Context) ([]*data.Link, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, index, created_at ` +
-		`FROM public.links`
+		`id, user_id, created_at ` +
+		`FROM public.links `
 	// run
 	var links []*data.Link
 	err := q.db.SelectRawContext(ctx, &links, sqlstr)
@@ -454,13 +455,13 @@ func (s Storage) LinkToProofQ() data.LinkToProofQ {
 func (q LinkToProofQ) InsertCtx(ctx context.Context, l *data.LinkToProof) error {
 	// insert (primary key generated and returned by database)
 	sqlstr := `INSERT INTO public.links_to_proofs (` +
-		`link_id` +
+		`link_id, proof_id` +
 		`) VALUES (` +
-		`$1` +
+		`$1, $2` +
 		`) RETURNING id`
 	// run
 
-	err := q.db.GetRawContext(ctx, &l.ID, sqlstr, l.LinkID)
+	err := q.db.ExecRawContext(ctx, sqlstr, l.LinkID, l.ProofID)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute insert")
 	}
@@ -472,7 +473,7 @@ func (q LinkToProofQ) InsertCtx(ctx context.Context, l *data.LinkToProof) error 
 func (q LinkToProofQ) SelectAllCtx(ctx context.Context) ([]*data.LinkToProof, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, link_id ` +
+		`link_id, proof_id ` +
 		`FROM public.links_to_proofs`
 	// run
 	var linkToProofs []*data.LinkToProof
@@ -489,24 +490,21 @@ func (q LinkToProofQ) SelectAll() ([]*data.LinkToProof, error) {
 	return q.SelectAllCtx(context.Background())
 }
 
-// GetLastIndex retrieves the last index from 'public.links'.
-func (q LinkQ) GetLastIndex() (int, error) {
+// GetProofsByLinkID retrieves all proofs for a given userDID from 'public.proofs'.
+func (q LinkToProofQ) GetProofsByLinkID(linkID uuid.UUID) ([]data.LinkToProof, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`index ` +
-		`FROM public.links ` +
-		`ORDER BY index DESC LIMIT 1`
+		`link_id, proof_id ` +
+		`FROM public.links_to_proofs ` +
+		`WHERE link_id = $1`
 	// run
-	var index int
-	err := q.db.GetRaw(&index, sqlstr)
-	if sql.ErrNoRows == err {
-		return -1, nil
-	}
+	var linkToProofs []data.LinkToProof
+	err := q.db.SelectRaw(&linkToProofs, sqlstr, linkID)
 	if err != nil {
-		return 0, errors.Wrap(err, "failed to execute select")
+		return nil, errors.Wrap(err, "failed to execute select")
 	}
 
-	return index, nil
+	return linkToProofs, nil
 }
 
 // Transaction begins a transaction on repo.
@@ -516,19 +514,37 @@ func (q LinkQ) Transaction(fn func(db data.ProofLinkQ) error) error {
 	})
 }
 
-// GetProofsByIndex retrieves all proofs for a given userDID from 'public.proofs'.
-func (q LinkQ) GetProofsByIndex(index int) ([]data.Link, error) {
+// GetProofsByUserDID retrieves all proofs for a given userDID from 'public.proofs'.
+func (q LinkQ) GetProofsByUserDID(userDID string) ([]data.Link, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, index, created_at ` +
+		`id, user_id, created_at ` +
 		`FROM public.links ` +
-		`WHERE index = $1`
+		`WHERE user_id = $1`
 	// run
 	var links []data.Link
-	err := q.db.SelectRaw(&links, sqlstr, index)
+	err := q.db.SelectRaw(&links, sqlstr, userDID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to execute select")
 	}
 
 	return links, nil
+}
+
+// InsertCtx inserts a LinkToProof to the database.
+func (q LinkQ) InsertCtxLinkToProof(ctx context.Context, l *data.LinkToProof) error {
+	// insert (primary key generated and returned by database)
+	sqlstr := `INSERT INTO public.links_to_proofs (` +
+		`link_id, proof_id` +
+		`) VALUES (` +
+		`$1, $2` +
+		`)`
+	// run
+
+	err := q.db.ExecRawContext(ctx, sqlstr, l.LinkID, l.ProofID)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute insert")
+	}
+
+	return nil
 }

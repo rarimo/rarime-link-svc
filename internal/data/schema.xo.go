@@ -9,6 +9,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"regexp"
 	"strings"
 	"time"
@@ -71,7 +72,7 @@ type GorpMigration struct {
 
 // Proof represents a row from 'public.proofs'.
 type Proof struct {
-	ID        int       `db:"id" json:"id" structs:"id"`                          // id
+	ID        uuid.UUID `db:"id" json:"id" structs:"id"`                         // id
 	Creator   string    `db:"creator" json:"creator" structs:"creator"`          // creator
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
@@ -80,13 +81,13 @@ type Proof struct {
 
 // Link represents a row from 'public.links'.
 type Link struct {
-	ID        int       `db:"id" json:"id" structs:"id"`                         // id
-	Index     int       `db:"index" json:"index" structs:"index"`                // index
+	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                         // id
+	UserID 	  string 	`db:"user_id" json:"user_id" structs:"user_id"` 		 // user_id
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 }
 
 // LinkToProof represents a row from 'public.links_to_proofs'.
 type LinkToProof struct {
-	ID 		int `db:"id" json:"id" structs:"-"`                      // id
-	LinkID  int `db:"link_id" json:"link_id" structs:"link_id"`    // link_id
+	LinkID  uuid.UUID `db:"link_id" json:"link_id" structs:"link_id"`    // link_id
+	ProofID uuid.UUID `db:"proof_id" json:"proof_id" structs:"proof_id"` // proof_id
 }

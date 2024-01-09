@@ -6,6 +6,7 @@ require (
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
+	github.com/google/uuid v1.3.0
 	github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a
 	github.com/rubenv/sql-migrate v1.5.2
 	gitlab.com/distributed_lab/ape v1.7.1
