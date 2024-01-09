@@ -41,7 +41,7 @@ func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
 	linkID := uuid.New()
 
 	var proofs []data.Proof
-	err = Storage(r).ProofLinkQ().Transaction(func(q data.ProofLinkQ) error {
+	err = Storage(r).LinkQ().Transaction(func(q data.ProofLinkQ) error {
 
 		err = q.InsertCtx(r.Context(), &data.Link{
 			ID:        linkID,
