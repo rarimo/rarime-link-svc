@@ -30,7 +30,7 @@ func newProofLinkCreateRequest(r *http.Request) (*ProofLinkRequest, error) {
 	return &req, nil
 }
 
-func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
+func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofLinkCreateRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)

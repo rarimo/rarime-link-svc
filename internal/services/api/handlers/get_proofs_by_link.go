@@ -28,7 +28,7 @@ func newProofLinkByIDRequest(r *http.Request) (proofsByLinkID, error) {
 	return proofsByLinkID{uuidLinkID}, nil
 }
 
-func ProofLinkByID(w http.ResponseWriter, r *http.Request) {
+func GetProofsByLinkID(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofLinkByIDRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
@@ -48,7 +48,7 @@ func ProofLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response resources.ProofLinkByIdListResponse
+	var response resources.ProofListResponse
 	for _, proof := range proofs {
 		proof, err := Storage(r).ProofQ().ProofByID(proof.ProofID, false)
 		if err != nil {
@@ -56,16 +56,15 @@ func ProofLinkByID(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
-		proofsResponse := resources.ProofLinkByIdResponse{
-			Data: resources.ProofLinkById{
+		proofsResponse := resources.ProofResponse{
+			Data: resources.Proof{
 				Key: resources.Key{
 					ID:   proof.ID.String(),
 					Type: resources.PROOFS,
 				},
-				Attributes: resources.ProofLinkByIdAttributes{
+				Attributes: resources.ProofAttributes{
 					CreatedAt: proof.CreatedAt.String(),
 					Creator:   proof.Creator,
-					Link:      req.LinkID.String(),
 					Proof:     string(proof.Proof),
 					Type:      proof.Type,
 				},

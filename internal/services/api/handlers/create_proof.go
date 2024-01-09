@@ -40,7 +40,7 @@ func newProofCreateRequest(r *http.Request) (*proofCreateRequest, error) {
 	return &req, nil
 }
 
-func ProofCreate(w http.ResponseWriter, r *http.Request) {
+func CreateProof(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofCreateRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)

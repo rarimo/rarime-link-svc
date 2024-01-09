@@ -26,7 +26,7 @@ func newProofsByUserDIDRequest(r *http.Request) (proofsByUserDIDRequest, error) 
 	}.Filter()
 }
 
-func ProofsByUserDID(w http.ResponseWriter, r *http.Request) {
+func GetProofsByUserDID(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofsByUserDIDRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
