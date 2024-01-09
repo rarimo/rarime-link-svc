@@ -45,7 +45,7 @@ func ProofLinkCreate(w http.ResponseWriter, r *http.Request) {
 
 		err = q.Insert(&data.Link{
 			ID:        linkID,
-			UserID:    "user_did",
+			UserID:    UserID(r),
 			CreatedAt: timestamp,
 		})
 		if err != nil {
