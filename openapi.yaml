@@ -301,7 +301,8 @@ components:
                 - creator
                 - created_at
                 - proof
-                - type
+                - proof_type
+                - org_id
               properties:
                 creator:
                   type: string
@@ -314,22 +315,29 @@ components:
                   type: string
                   description: The proof object in JSON string format
                   example: '{"pub_signals":[...],"proof":{"pi_a":[...],"pi_b":[],"pi_c":[...]}}'
-                type:
+                proof_type:
                   type: string
                   description: The type of the proof
+                org_id:
+                  type: string
+                  description: The ID of the organization that issued the proof's claim
     ProofCreate:
       type: object
       required:
         - proof
-        - type
+        - proof_type
+        - org_id
       properties:
         proof:
           type: string
           description: The proof object in JSON string format
           example: '{"pub_signals":[...],"proof":{"pi_a":[...],"pi_b":[],"pi_c":[...]}}'
-        type:
+        proof_type:
           type: string
           description: The type of the proof
+        org_id:
+          type: string
+          description: The ID of the organization that issued the proof's claim
     ProofKey:
       type: object
       required:

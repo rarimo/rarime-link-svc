@@ -455,7 +455,8 @@
                   "creator",
                   "created_at",
                   "proof",
-                  "type"
+                  "proof_type",
+                  "org_id"
                 ],
                 "properties": {
                   "creator": {
@@ -472,9 +473,13 @@
                     "description": "The proof object in JSON string format",
                     "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
                   },
-                  "type": {
+                  "proof_type": {
                     "type": "string",
                     "description": "The type of the proof"
+                  },
+                  "org_id": {
+                    "type": "string",
+                    "description": "The ID of the organization that issued the proof's claim"
                   }
                 }
               }
@@ -486,7 +491,8 @@
         "type": "object",
         "required": [
           "proof",
-          "type"
+          "proof_type",
+          "org_id"
         ],
         "properties": {
           "proof": {
@@ -494,9 +500,13 @@
             "description": "The proof object in JSON string format",
             "example": "{\"pub_signals\":[...],\"proof\":{\"pi_a\":[...],\"pi_b\":[],\"pi_c\":[...]}}"
           },
-          "type": {
+          "proof_type": {
             "type": "string",
             "description": "The type of the proof"
+          },
+          "org_id": {
+            "type": "string",
+            "description": "The ID of the organization that issued the proof's claim"
           }
         }
       },
