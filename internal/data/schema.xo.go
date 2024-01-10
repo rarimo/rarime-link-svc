@@ -92,6 +92,7 @@ type Proof struct {
 	Creator   string    `db:"creator" json:"creator" structs:"creator"`          // creator
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
+	OrgID     uuid.UUID `db:"org_id" json:"org_id" structs:"org_id"`             // org_id
 	Type      string    `db:"type" json:"type" structs:"type"`                   // type
 
 }

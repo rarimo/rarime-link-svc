@@ -35,22 +35,22 @@ func GetProofsByLinkID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proofs, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), req.LinkID)
+	links, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), req.LinkID)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get link to proofs")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	if proofs == nil {
+	if links == nil {
 		Log(r).WithField("link_id", req.LinkID).Warn("link not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
 	var response resources.ProofListResponse
-	for _, proof := range proofs {
-		proof, err := Storage(r).ProofQ().ProofByID(proof.ProofID, false)
+	for _, link := range links {
+		proof, err := Storage(r).ProofQ().ProofByID(link.ProofID, false)
 		if err != nil {
 			Log(r).WithError(err).Error("failed to get proof")
 			ape.RenderErr(w, problems.InternalError())
@@ -66,7 +66,8 @@ func GetProofsByLinkID(w http.ResponseWriter, r *http.Request) {
 					CreatedAt: proof.CreatedAt.String(),
 					Creator:   proof.Creator,
 					Proof:     string(proof.Proof),
-					Type:      proof.Type,
+					ProofType: proof.Type,
+					OrgId:     proof.OrgID.String(),
 				},
 			},
 		}

@@ -31,7 +31,7 @@ func newProofCreateRequest(r *http.Request) (*proofCreateRequest, error) {
 		}
 	}
 
-	if req.Data.Type == "" {
+	if req.Data.ProofType == "" {
 		return nil, validation.Errors{
 			"type": errors.New("type is required"),
 		}
@@ -47,12 +47,19 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	orgID, err := uuid.Parse(req.Data.OrgId)
+	if err != nil {
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
 	proof := data.Proof{
 		ID:        uuid.New(),
 		Creator:   UserID(r),
 		CreatedAt: time.Now().UTC(),
 		Proof:     []byte(req.Data.Proof),
-		Type:      req.Data.Type,
+		Type:      req.Data.ProofType,
+		OrgID:     orgID,
 	}
 
 	err = Storage(r).ProofQ().Insert(&proof)
@@ -72,7 +79,8 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
-				Type:      proof.Type,
+				ProofType: proof.Type,
+				OrgId:     proof.OrgID.String(),
 			},
 		},
 		Included: resources.Included{},
