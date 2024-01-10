@@ -292,18 +292,18 @@ func (s Storage) ProofQ() data.ProofQ {
 	return NewProofQ(s.DB())
 }
 
-var colsProof = `id, creator, created_at, proof, type`
+var colsProof = `id, creator, created_at, proof, org_id, type`
 
 // InsertCtx inserts a Proof to the database.
 func (q ProofQ) InsertCtx(ctx context.Context, p *data.Proof) error {
 	// sql insert query, primary key must be provided
 	sqlstr := `INSERT INTO public.proofs (` +
-		`id, creator, created_at, proof, type` +
+		`id, creator, created_at, proof, org_id, type` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5` +
+		`$1, $2, $3, $4, $5, $6` +
 		`)`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.Type)
+	err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.OrgID, p.Type)
 	return errors.Wrap(err, "failed to execute insert query")
 }
 
@@ -316,10 +316,10 @@ func (q ProofQ) Insert(p *data.Proof) error {
 func (q ProofQ) UpdateCtx(ctx context.Context, p *data.Proof) error {
 	// update with composite primary key
 	sqlstr := `UPDATE public.proofs SET ` +
-		`creator = $1, proof = $2, type = $3 ` +
-		`WHERE id = $4`
+		`creator = $1, proof = $2, org_id = $3, type = $4 ` +
+		`WHERE id = $5`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, p.Creator, p.Proof, p.Type, p.ID)
+	err := q.db.ExecRawContext(ctx, sqlstr, p.Creator, p.Proof, p.OrgID, p.Type, p.ID)
 	return errors.Wrap(err, "failed to execute update")
 }
 
@@ -332,15 +332,15 @@ func (q ProofQ) Update(p *data.Proof) error {
 func (q ProofQ) UpsertCtx(ctx context.Context, p *data.Proof) error {
 	// upsert
 	sqlstr := `INSERT INTO public.proofs (` +
-		`id, creator, created_at, proof, type` +
+		`id, creator, created_at, proof, org_id, type` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5` +
+		`$1, $2, $3, $4, $5, $6` +
 		`)` +
 		` ON CONFLICT (id) DO ` +
 		`UPDATE SET ` +
-		`creator = EXCLUDED.creator, proof = EXCLUDED.proof, type = EXCLUDED.type `
+		`creator = EXCLUDED.creator, proof = EXCLUDED.proof, org_id = EXCLUDED.org_id, type = EXCLUDED.type `
 	// run
-	if err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.Type); err != nil {
+	if err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.OrgID, p.Type); err != nil {
 		return errors.Wrap(err, "failed to execute upsert stmt")
 	}
 	return nil
@@ -473,7 +473,7 @@ func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID, proofID uuid.UUID, is
 func (q ProofQ) ProofByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Proof, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, creator, created_at, proof, type ` +
+		`id, creator, created_at, proof, org_id, type ` +
 		`FROM public.proofs ` +
 		`WHERE id = $1`
 	// run

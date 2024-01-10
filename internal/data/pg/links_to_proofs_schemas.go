@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/rarimo/rarime-link-svc/internal/data"

@@ -4,6 +4,7 @@ create table if not exists proofs(
     creator    text not null,
     created_at timestamp without time zone not null default now(),
     proof      jsonb not null,
+    org_id     uuid not null,
     type       text not null
 );
 

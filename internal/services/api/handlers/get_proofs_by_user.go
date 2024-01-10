@@ -59,7 +59,8 @@ func GetProofsByUserDID(w http.ResponseWriter, r *http.Request) {
 					CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
 					Creator:   proof.Creator,
 					Proof:     string(proof.Proof),
-					Type:      proof.Type,
+					ProofType: proof.Type,
+					OrgId:     proof.OrgID.String(),
 				},
 			},
 		}
