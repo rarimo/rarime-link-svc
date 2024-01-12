@@ -459,8 +459,9 @@
                   },
                   "created_at": {
                     "type": "string",
-                    "description": "The date and time when the proof was created in the timestamp format",
-                    "example": "1702480643"
+                    "format": "time.Time",
+                    "description": "The date and time when the proof was created in the RFC3339 format",
+                    "example": "2021-08-12T12:00:00Z"
                   }
                 }
               }
@@ -505,7 +506,8 @@
                   "created_at",
                   "proof",
                   "proof_type",
-                  "org_id"
+                  "org_id",
+                  "schema_url"
                 ],
                 "properties": {
                   "creator": {
@@ -514,8 +516,9 @@
                   },
                   "created_at": {
                     "type": "string",
-                    "description": "The date and time when the proof was created in the timestamp format",
-                    "example": "1702480643"
+                    "format": "time.Time",
+                    "description": "The date and time when the proof was created in the RFC3339 format",
+                    "example": "2021-08-12T12:00:00Z"
                   },
                   "proof": {
                     "type": "string",
@@ -529,6 +532,10 @@
                   "org_id": {
                     "type": "string",
                     "description": "The ID of the organization that issued the proof's claim"
+                  },
+                  "schema_url": {
+                    "type": "string",
+                    "description": "The schema URL of the claim the proof was created based on"
                   }
                 }
               }
@@ -541,7 +548,8 @@
         "required": [
           "proof",
           "proof_type",
-          "org_id"
+          "org_id",
+          "schema_url"
         ],
         "properties": {
           "proof": {
@@ -556,6 +564,10 @@
           "org_id": {
             "type": "string",
             "description": "The ID of the organization that issued the proof's claim"
+          },
+          "schema_url": {
+            "type": "string",
+            "description": "The schema URL of the claim the proof was created based on"
           }
         }
       },

@@ -305,8 +305,9 @@ components:
                   example: 05260b49-2c35-48b9-8300-d39ae48ca312
                 created_at:
                   type: string
-                  description: The date and time when the proof was created in the timestamp format
-                  example: '1702480643'
+                  format: time.Time
+                  description: The date and time when the proof was created in the RFC3339 format
+                  example: '2021-08-12T12:00:00Z'
     LinkKey:
       type: object
       required:
@@ -335,14 +336,16 @@ components:
                 - proof
                 - proof_type
                 - org_id
+                - schema_url
               properties:
                 creator:
                   type: string
                   description: The ID of the user who created the proof
                 created_at:
                   type: string
-                  description: The date and time when the proof was created in the timestamp format
-                  example: '1702480643'
+                  format: time.Time
+                  description: The date and time when the proof was created in the RFC3339 format
+                  example: '2021-08-12T12:00:00Z'
                 proof:
                   type: string
                   description: The proof object in JSON string format
@@ -353,12 +356,16 @@ components:
                 org_id:
                   type: string
                   description: The ID of the organization that issued the proof's claim
+                schema_url:
+                  type: string
+                  description: The schema URL of the claim the proof was created based on
     ProofCreate:
       type: object
       required:
         - proof
         - proof_type
         - org_id
+        - schema_url
       properties:
         proof:
           type: string
@@ -370,6 +377,9 @@ components:
         org_id:
           type: string
           description: The ID of the organization that issued the proof's claim
+        schema_url:
+          type: string
+          description: The schema URL of the claim the proof was created based on
     ProofKey:
       type: object
       required:
