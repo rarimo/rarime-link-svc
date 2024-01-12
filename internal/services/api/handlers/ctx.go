@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
+	"net/http"
+
+	"github.com/rarimo/rarime-auth-svc/resources"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"gitlab.com/distributed_lab/logan/v3"
-	"net/http"
 )
 
 type ctxKey int
@@ -12,7 +14,7 @@ type ctxKey int
 const (
 	logCtxKey ctxKey = iota
 	storageCtxKey
-	userIDCtxKey
+	userClaimCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -35,12 +37,12 @@ func Storage(r *http.Request) data.Storage {
 	return r.Context().Value(storageCtxKey).(data.Storage)
 }
 
-func CtxUserID(userID string) func(context.Context) context.Context {
+func CtxUserClaim(claim []resources.Claim) func(context.Context) context.Context {
 	return func(ctx context.Context) context.Context {
-		return context.WithValue(ctx, userIDCtxKey, userID)
+		return context.WithValue(ctx, userClaimCtxKey, claim)
 	}
 }
 
-func UserID(r *http.Request) string {
-	return r.Context().Value(userIDCtxKey).(string)
+func UserClaim(r *http.Request) []resources.Claim {
+	return r.Context().Value(userClaimCtxKey).([]resources.Claim)
 }

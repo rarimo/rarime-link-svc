@@ -11,4 +11,6 @@ type ProofCreate struct {
 	Proof string `json:"proof"`
 	// The type of the proof
 	ProofType string `json:"proof_type"`
+	// The user DID
+	UserDid string `json:"user_did"`
 }

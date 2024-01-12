@@ -1,15 +1,17 @@
 package handlers
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"net/http"
-	"strconv"
 )
 
 type proofByIDRequest struct {
@@ -44,6 +46,11 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 	if proof == nil {
 		Log(r).WithField("id", req.ID).Warn("proof not found")
 		ape.RenderErr(w, problems.NotFound())
+		return
+	}
+
+	if !auth.Authenticates(UserClaim(r), auth.UserGrant(proof.Creator)) {
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 

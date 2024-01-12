@@ -3,8 +3,6 @@ get:
   description: >
     Returns information about the all proofs of the link.
   operationId: proofsByLinkID
-  security:
-    - Bearer: [ ]
   tags:
     - Proofs
   parameters:

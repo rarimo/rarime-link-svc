@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/internal/data/pg"
 	"gitlab.com/distributed_lab/kit/comfig"
@@ -13,6 +14,7 @@ type Config interface {
 	comfig.Logger
 	comfig.Listenerer
 	pgdb.Databaser
+	auth.Auther
 	LinkConfiger
 	RunningPeriods
 	SubServices
@@ -24,6 +26,7 @@ type config struct {
 	pgdb.Databaser
 	types.Copuser
 	comfig.Listenerer
+	auth.Auther
 	LinkConfiger
 	RunningPeriods
 	SubServices
@@ -40,6 +43,7 @@ func New(getter kv.Getter) Config {
 		RunningPeriods: NewRunningPeriods(getter),
 		SubServices:    NewSubServices(),
 		Databaser:      pgdb.NewDatabaser(getter),
+		Auther:         auth.NewAuther(getter),
 	}
 }
 

@@ -3,6 +3,8 @@ get:
   description: >
     Returns information about the particular proof.
   operationId: proofByID
+  security:
+    - Bearer: [ ]
   tags:
     - Proofs
   parameters:

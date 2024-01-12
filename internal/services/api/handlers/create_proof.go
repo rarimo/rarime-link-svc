@@ -2,16 +2,18 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
+	"time"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 type proofCreateRequest struct {
@@ -49,6 +51,11 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !auth.Authenticates(UserClaim(r), auth.UserGrant(req.Data.UserDid)) {
+		ape.RenderErr(w, problems.Unauthorized())
+		return
+	}
+
 	orgID, err := uuid.Parse(req.Data.OrgId)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
@@ -57,7 +64,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 
 	proof := data.Proof{
 		ID:        uuid.New(),
-		Creator:   UserID(r),
+		Creator:   req.Data.UserDid,
 		CreatedAt: time.Now().UTC(),
 		Proof:     []byte(req.Data.Proof),
 		Type:      req.Data.ProofType,

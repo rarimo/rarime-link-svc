@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"context"
+	"net/http"
+	"strconv"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/urlval"
-	"net/http"
-	"strconv"
 )
 
 type proofsLinksByUserDIDRequest struct {

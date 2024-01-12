@@ -17,6 +17,9 @@ post:
             data:
               type: object
               properties:
+                user_did:
+                  type: string
+                  description: User DID that owns all selected proofs
                 proofs_ids:
                   type: array
                   items:

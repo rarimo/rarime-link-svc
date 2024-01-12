@@ -3,7 +3,11 @@ required:
   - proof
   - proof_type
   - org_id
+  - user_did
 properties:
+  user_did:
+    type: string
+    description: The user DID
   proof:
     type: string
     description: The proof object in JSON string format
