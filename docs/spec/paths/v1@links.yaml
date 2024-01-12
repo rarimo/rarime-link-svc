@@ -37,7 +37,7 @@ post:
             properties:
               data:
                 type: object
-                $ref: '#/components/schemas/ProofLink'
+                $ref: '#/components/schemas/Link'
     400:
       $ref: '#/components/responses/invalidParameter'
     401:
@@ -75,7 +75,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProofLink'
+                  $ref: '#/components/schemas/Link'
 
     400:
       $ref: '#/components/responses/invalidParameter'
