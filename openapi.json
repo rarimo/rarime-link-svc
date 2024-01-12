@@ -35,6 +35,10 @@
                   "data": {
                     "type": "object",
                     "properties": {
+                      "user_did": {
+                        "type": "string",
+                        "description": "User DID that owns all selected proofs"
+                      },
                       "proofs_ids": {
                         "type": "array",
                         "items": {
@@ -147,11 +151,6 @@
         "summary": "Get Proofs by Link ID",
         "description": "Returns information about the all proofs of the link.\n",
         "operationId": "proofsByLinkID",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
         "tags": [
           "Proofs"
         ],
@@ -323,6 +322,11 @@
         "summary": "Get Proof by ID",
         "description": "Returns information about the particular proof.\n",
         "operationId": "proofByID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "tags": [
           "Proofs"
         ],
@@ -549,9 +553,14 @@
           "proof",
           "proof_type",
           "org_id",
+          "user_did",
           "schema_url"
         ],
         "properties": {
+          "user_did": {
+            "type": "string",
+            "description": "The user DID"
+          },
           "proof": {
             "type": "string",
             "description": "The proof object in JSON string format",
