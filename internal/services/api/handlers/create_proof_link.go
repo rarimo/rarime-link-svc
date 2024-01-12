@@ -46,9 +46,11 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		timestamp = time.Now().UTC()
-		linkID    = uuid.New()
-		proofs    []data.Proof
+		timestamp      = time.Now().UTC()
+		linkID         = uuid.New()
+		proofs         []data.Proof
+		proofNotFound  = errors.New("proof not found")
+		invalidCreator = errors.New("invalid proof creator")
 	)
 
 	err = Storage(r).LinkQ().Transaction(func(q data.LinkQ) error {
@@ -59,13 +61,25 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
+			ape.RenderErr(w, problems.InternalError())
 			return err
 		}
 
 		for _, proofID := range req.Data.ProofsIds {
 			p, err := Storage(r).ProofQ().ProofByID(proofID, false)
 			if err != nil {
+				ape.RenderErr(w, problems.InternalError())
 				return err
+			}
+
+			if p == nil {
+				ape.RenderErr(w, problems.NotFound())
+				return proofNotFound
+			}
+
+			if p.Creator != req.Data.UserDID {
+				ape.RenderErr(w, problems.Unauthorized())
+				return invalidCreator
 			}
 
 			proofs = append(proofs, *p)
@@ -73,8 +87,10 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 			err = q.InsertCtxLinkToProof(r.Context(), data.LinksToProof{
 				LinkID:  linkID,
 				ProofID: proofID,
-			}) // If proof entry does not exist then will be an error
+			})
+
 			if err != nil {
+				ape.RenderErr(w, problems.InternalError())
 				return err
 			}
 		}
@@ -84,7 +100,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		Log(r).WithError(err).Error("failed to create proof link entry")
-		ape.RenderErr(w, problems.InternalError())
+		// Response error rendered before
 		return
 	}
 
