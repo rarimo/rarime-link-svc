@@ -12,118 +12,7 @@
     }
   ],
   "paths": {
-    "/v1/proofs": {
-      "post": {
-        "tags": [
-          "Proofs"
-        ],
-        "summary": "Create the proof",
-        "description": "Allows to create a proof in the service database. After saving the proof, it will be accessible by its ID.\n",
-        "operationId": "createProof",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "$ref": "#/components/schemas/ProofCreate"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Proof"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "401": {
-            "$ref": "#/components/responses/invalidAuth"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/v1/proofs/{id}": {
-      "get": {
-        "summary": "Get Proof by ID",
-        "description": "Returns information about the particular proof.\n",
-        "operationId": "proofByID",
-        "tags": [
-          "Proofs"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "The ID of the proof",
-            "schema": {
-              "type": "string",
-              "example": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Proof"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/invalidParameter"
-          },
-          "404": {
-            "$ref": "#/components/responses/notFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/internalError"
-          }
-        }
-      }
-    },
-    "/v1/proofs/link": {
+    "/v1/links": {
       "post": {
         "tags": [
           "Proofs"
@@ -194,9 +83,66 @@
             "$ref": "#/components/responses/internalError"
           }
         }
+      },
+      "get": {
+        "summary": "Get Proofs Links by User DID",
+        "description": "Returns information about the all links of the user.\n",
+        "operationId": "proofsLinksByUserDID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Proofs"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "did",
+            "required": true,
+            "description": "The User DID",
+            "schema": {
+              "type": "string",
+              "example": "did:iden3:readonly:tM1QCJ7ytcbvLB7EFQhGsJPumc11DEE18gEvAzxE7"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProofLink"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
       }
     },
-    "/v1/proofs/link/{link_id}": {
+    "/v1/links/{link_id}": {
       "get": {
         "summary": "Get Proofs by Link ID",
         "description": "Returns information about the all proofs of the link.\n",
@@ -255,7 +201,65 @@
         }
       }
     },
-    "/v1/proofs/user/{user_did}": {
+    "/v1/proofs": {
+      "post": {
+        "tags": [
+          "Proofs"
+        ],
+        "summary": "Create the proof",
+        "description": "Allows to create a proof in the service database. After saving the proof, it will be accessible by its ID.\n",
+        "operationId": "createProof",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/ProofCreate"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Proof"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidParameter"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidAuth"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalError"
+          }
+        }
+      },
       "get": {
         "summary": "Get Proofs by User DID",
         "description": "Returns information about the all proofs of the user.\n",
@@ -270,8 +274,8 @@
         ],
         "parameters": [
           {
-            "in": "path",
-            "name": "user_did",
+            "in": "query",
+            "name": "did",
             "required": true,
             "description": "The User DID",
             "schema": {
@@ -314,28 +318,23 @@
         }
       }
     },
-    "/v1/proofs/user/{user_did}/link": {
+    "/v1/proofs/{id}": {
       "get": {
-        "summary": "Get Proofs Links by User DID",
-        "description": "Returns information about the all links of the user.\n",
-        "operationId": "proofsLinksByUserDID",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
+        "summary": "Get Proof by ID",
+        "description": "Returns information about the particular proof.\n",
+        "operationId": "proofByID",
         "tags": [
           "Proofs"
         ],
         "parameters": [
           {
             "in": "path",
-            "name": "user_did",
+            "name": "id",
             "required": true,
-            "description": "The User DID",
+            "description": "The ID of the proof",
             "schema": {
               "type": "string",
-              "example": "did:iden3:readonly:tM1QCJ7ytcbvLB7EFQhGsJPumc11DEE18gEvAzxE7"
+              "example": 1
             }
           }
         ],
@@ -351,10 +350,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ProofLink"
-                      }
+                      "$ref": "#/components/schemas/Proof"
                     }
                   }
                 }
@@ -435,6 +431,59 @@
                 }
               }
             }
+          }
+        }
+      },
+      "Link": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LinkKey"
+          },
+          {
+            "type": "object",
+            "required": [
+              "attributes"
+            ],
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "created_at",
+                  "link"
+                ],
+                "properties": {
+                  "link": {
+                    "type": "string",
+                    "description": "UUID Link to proofs",
+                    "example": "05260b49-2c35-48b9-8300-d39ae48ca312"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "description": "The date and time when the proof was created in the timestamp format",
+                    "example": "1702480643"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LinkKey": {
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "links"
+            ]
           }
         }
       },
@@ -528,40 +577,6 @@
             ]
           }
         }
-      },
-      "ProofLink": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ProofKey"
-          },
-          {
-            "type": "object",
-            "required": [
-              "attributes"
-            ],
-            "properties": {
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "created_at",
-                  "link"
-                ],
-                "properties": {
-                  "link": {
-                    "type": "string",
-                    "description": "UUID Link to proofs",
-                    "example": "05260b49-2c35-48b9-8300-d39ae48ca312"
-                  },
-                  "created_at": {
-                    "type": "string",
-                    "description": "The date and time when the proof was created in the timestamp format",
-                    "example": "1702480643"
-                  }
-                }
-              }
-            }
-          }
-        ]
       }
     },
     "responses": {
