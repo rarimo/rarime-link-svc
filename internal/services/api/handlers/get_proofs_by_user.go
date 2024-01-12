@@ -2,6 +2,7 @@ package handlers
 
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -29,6 +30,11 @@ func GetProofs(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofsRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	if !auth.Authenticates(UserClaim(r), auth.UserGrant(req.UserDid)) {
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 

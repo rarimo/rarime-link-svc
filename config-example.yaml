@@ -16,3 +16,6 @@ running_periods:
 
 db:
   url: postgres://link:link@localhost:15432/link-db?sslmode=disable
+
+auth:
+  addr: auth-svc:8000

@@ -1,25 +1,31 @@
 package handlers
 
 import (
-	"context"
+	"net/http"
+
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"net/http"
+	"gitlab.com/distributed_lab/logan/v3"
 )
 
-func AuthMiddleware() func(http.Handler) http.Handler {
+func AuthMiddleware(auth *auth.Client, log *logan.Entry) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// TODO: implement auth and user id extraction
-			userID := r.Header.Get("Authorization")
-			if userID == "" {
-				ape.Render(w, problems.Unauthorized())
+			claims, status, err := auth.ValidateJWT(r.Header)
+			if err != nil {
+				if status == http.StatusUnauthorized {
+					ape.Render(w, problems.Unauthorized())
+					return
+				}
+
+				log.WithError(err).Error("failed to execute auth validate request")
+				ape.Render(w, problems.InternalError())
 				return
 			}
 
-			r = r.WithContext(context.WithValue(r.Context(), userIDCtxKey, userID))
-
-			next.ServeHTTP(w, r)
+			ctx := CtxUserClaim(claims)(r.Context())
+			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
