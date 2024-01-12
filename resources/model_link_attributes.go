@@ -4,9 +4,11 @@
 
 package resources
 
+import "time"
+
 type LinkAttributes struct {
-	// The date and time when the proof was created in the timestamp format
-	CreatedAt string `json:"created_at"`
+	// The date and time when the proof was created in the RFC3339 format
+	CreatedAt time.Time `json:"created_at"`
 	// UUID Link to proofs
 	Link string `json:"link"`
 }

@@ -66,7 +66,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 				Type: resources.LINKS,
 			},
 			Attributes: resources.LinkAttributes{
-				CreatedAt: link.CreatedAt.UTC().String(),
+				CreatedAt: link.CreatedAt,
 				Link:      link.ID.String(),
 			},
 		},
@@ -86,11 +86,12 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 				Type: resources.PROOFS,
 			},
 			Attributes: resources.ProofAttributes{
-				CreatedAt: proof.CreatedAt.String(),
+				CreatedAt: proof.CreatedAt,
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
+				SchemaUrl: proof.SchemaURL,
 			},
 		})
 	}

@@ -16,5 +16,6 @@ allOf:
             example: '05260b49-2c35-48b9-8300-d39ae48ca312'
           created_at:
             type: string
-            description: The date and time when the proof was created in the timestamp format
-            example: '1702480643'
+            format: time.Time
+            description: The date and time when the proof was created in the RFC3339 format
+            example: "2021-08-12T12:00:00Z"

@@ -9,7 +9,6 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"net/http"
-	"strconv"
 )
 
 type proofByIDRequest struct {
@@ -54,11 +53,12 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 				Type: resources.PROOFS,
 			},
 			Attributes: resources.ProofAttributes{
-				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
+				CreatedAt: proof.CreatedAt,
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
+				SchemaUrl: proof.SchemaURL,
 			},
 		},
 		Included: resources.Included{},
