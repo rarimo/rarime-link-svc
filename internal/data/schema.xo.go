@@ -94,5 +94,6 @@ type Proof struct {
 	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
 	OrgID     uuid.UUID `db:"org_id" json:"org_id" structs:"org_id"`             // org_id
 	Type      string    `db:"type" json:"type" structs:"type"`                   // type
+	SchemaURL string    `db:"schema_url" json:"schema_url" structs:"schema_url"` // schema_url
 
 }

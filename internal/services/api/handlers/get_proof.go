@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -61,11 +60,12 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 				Type: resources.PROOFS,
 			},
 			Attributes: resources.ProofAttributes{
-				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
+				CreatedAt: proof.CreatedAt,
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
+				SchemaUrl: proof.SchemaURL,
 			},
 		},
 		Included: resources.Included{},

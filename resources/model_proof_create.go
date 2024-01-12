@@ -13,4 +13,6 @@ type ProofCreate struct {
 	ProofType string `json:"proof_type"`
 	// The user DID
 	UserDid string `json:"user_did"`
+	// The schema URL of the claim the proof was created based on
+	SchemaUrl string `json:"schema_url"`
 }

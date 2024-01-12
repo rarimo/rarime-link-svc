@@ -95,7 +95,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 			},
 			Attributes: resources.LinkAttributes{
 				Link:      linkID.String(),
-				CreatedAt: timestamp.String(),
+				CreatedAt: timestamp,
 			},
 		},
 		Included: resources.Included{},

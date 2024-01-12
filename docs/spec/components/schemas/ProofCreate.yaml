@@ -4,6 +4,7 @@ required:
   - proof_type
   - org_id
   - user_did
+  - schema_url
 properties:
   user_did:
     type: string
@@ -18,3 +19,6 @@ properties:
   org_id:
     type: string
     description: The ID of the organization that issued the proof's claim
+  schema_url:
+    type: string
+    description: The schema URL of the claim the proof was created based on

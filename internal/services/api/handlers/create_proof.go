@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -42,8 +41,6 @@ func newProofCreateRequest(r *http.Request) (*proofCreateRequest, error) {
 	return &req, nil
 }
 
-// TODO add schema_url; change time format
-
 func CreateProof(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofCreateRequest(r)
 	if err != nil {
@@ -69,6 +66,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		Proof:     []byte(req.Data.Proof),
 		Type:      req.Data.ProofType,
 		OrgID:     orgID,
+		SchemaURL: req.Data.SchemaUrl,
 	}
 
 	err = Storage(r).ProofQ().Insert(&proof)
@@ -85,11 +83,12 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 				Type: resources.PROOFS,
 			},
 			Attributes: resources.ProofAttributes{
-				CreatedAt: strconv.FormatInt(proof.CreatedAt.Unix(), 10),
+				CreatedAt: proof.CreatedAt,
 				Creator:   proof.Creator,
 				Proof:     string(proof.Proof),
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
+				SchemaUrl: req.Data.SchemaUrl,
 			},
 		},
 		Included: resources.Included{},

@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"context"
-	"net/http"
-	"strconv"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/urlval"
+	"net/http"
 )
 
 type proofsLinksByUserDIDRequest struct {
@@ -56,7 +55,7 @@ func GetLinks(w http.ResponseWriter, r *http.Request) {
 					Type: resources.LINKS,
 				},
 				Attributes: resources.LinkAttributes{
-					CreatedAt: strconv.FormatInt(link.CreatedAt.Unix(), 10),
+					CreatedAt: link.CreatedAt,
 					Link:      link.ID.String(),
 				},
 			},
