@@ -70,7 +70,7 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "$ref": "#/components/schemas/ProofLink"
+                      "$ref": "#/components/schemas/Link"
                     }
                   }
                 }
@@ -126,7 +126,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ProofLink"
+                        "$ref": "#/components/schemas/Link"
                       }
                     }
                   }
