@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"context"
-	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/logan/v3/errors"
+	"gitlab.com/distributed_lab/urlval"
 	"net/http"
 	"strconv"
 )
@@ -16,19 +15,20 @@ type proofsLinksByUserDIDRequest struct {
 	UserDid string
 }
 
-func newProofLinkByUserDIDRequest(r *http.Request) (proofsLinksByUserDIDRequest, error) {
-	userDid := chi.URLParam(r, "user_did")
-	if userDid == "" {
-		return proofsLinksByUserDIDRequest{}, errors.New("user_did is required")
+func newGetLinksRequest(r *http.Request) (proofsLinksByUserDIDRequest, error) {
+	request := proofsLinksByUserDIDRequest{}
+	if err := urlval.DecodeSilently(r.URL.Query(), &request); err != nil {
+		return request, err
 	}
+	request.UserDid = r.URL.Query().Get("filter[did]")
 
-	return proofsLinksByUserDIDRequest{userDid}, validation.Errors{
-		"user_did": validation.Validate(userDid, validation.Required),
+	return proofsLinksByUserDIDRequest{request.UserDid}, validation.Errors{
+		"did": validation.Validate(request.UserDid, validation.Required),
 	}.Filter()
 }
 
-func ProofsLinkByUserDID(w http.ResponseWriter, r *http.Request) {
-	req, err := newProofLinkByUserDIDRequest(r)
+func GetLinks(w http.ResponseWriter, r *http.Request) {
+	req, err := newGetLinksRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
@@ -40,29 +40,26 @@ func ProofsLinkByUserDID(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
 	if proofsLinks == nil {
 		Log(r).WithField("user_did", req.UserDid).Warn("proofs not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
-	var response resources.ProofLinkListResponse
-
+	var response resources.LinkListResponse
 	for _, link := range proofsLinks {
-		linkResponse := resources.ProofLinkResponse{
-			Data: resources.ProofLink{
+		linkResponse := resources.LinkResponse{
+			Data: resources.Link{
 				Key: resources.Key{
 					ID:   link.ID.String(),
-					Type: resources.PROOFS,
+					Type: resources.LINKS,
 				},
-				Attributes: resources.ProofLinkAttributes{
+				Attributes: resources.LinkAttributes{
 					CreatedAt: strconv.FormatInt(link.CreatedAt.Unix(), 10),
 					Link:      link.ID.String(),
 				},
 			},
 		}
-
 		response.Data = append(response.Data, linkResponse.Data)
 	}
 

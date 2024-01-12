@@ -14,7 +14,7 @@ type proofsByLinkID struct {
 	LinkID uuid.UUID
 }
 
-func newProofLinkByIDRequest(r *http.Request) (proofsByLinkID, error) {
+func newLinkByIDRequest(r *http.Request) (proofsByLinkID, error) {
 	linkID := chi.URLParam(r, "link_id")
 	if linkID == "" {
 		return proofsByLinkID{}, errors.New("user_did is required")
@@ -28,10 +28,22 @@ func newProofLinkByIDRequest(r *http.Request) (proofsByLinkID, error) {
 	return proofsByLinkID{uuidLinkID}, nil
 }
 
-func GetProofsByLinkID(w http.ResponseWriter, r *http.Request) {
-	req, err := newProofLinkByIDRequest(r)
+func GetLinkByID(w http.ResponseWriter, r *http.Request) {
+	req, err := newLinkByIDRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	link, err := Storage(r).LinkQ().LinkByID(req.LinkID, false)
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get link by UUID")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	if link == nil {
+		Log(r).WithField("link_id", req.LinkID).Warn("link not found")
+		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
@@ -41,39 +53,48 @@ func GetProofsByLinkID(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
-	if links == nil {
-		Log(r).WithField("link_id", req.LinkID).Warn("link not found")
+	if len(links) == 0 {
+		Log(r).WithField("link_id", req.LinkID).Warn("links not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
-	var response resources.ProofListResponse
-	for _, link := range links {
-		proof, err := Storage(r).ProofQ().ProofByID(link.ProofID, false)
+	response := resources.LinkResponse{
+		Data: resources.Link{
+			Key: resources.Key{
+				ID:   link.ID.String(),
+				Type: resources.LINKS,
+			},
+			Attributes: resources.LinkAttributes{
+				CreatedAt: link.CreatedAt.UTC().String(),
+				Link:      link.ID.String(),
+			},
+		},
+	}
+
+	included := resources.Included{}
+	for _, linkToProof := range links {
+		proof, err := Storage(r).ProofQ().ProofByID(linkToProof.ProofID, false)
 		if err != nil {
 			Log(r).WithError(err).Error("failed to get proof")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
-		proofsResponse := resources.ProofResponse{
-			Data: resources.Proof{
-				Key: resources.Key{
-					ID:   proof.ID.String(),
-					Type: resources.PROOFS,
-				},
-				Attributes: resources.ProofAttributes{
-					CreatedAt: proof.CreatedAt.String(),
-					Creator:   proof.Creator,
-					Proof:     string(proof.Proof),
-					ProofType: proof.Type,
-					OrgId:     proof.OrgID.String(),
-				},
+		included.Add(&resources.Proof{
+			Key: resources.Key{
+				ID:   proof.ID.String(),
+				Type: resources.PROOFS,
 			},
-		}
-
-		response.Data = append(response.Data, proofsResponse.Data)
+			Attributes: resources.ProofAttributes{
+				CreatedAt: proof.CreatedAt.String(),
+				Creator:   proof.Creator,
+				Proof:     string(proof.Proof),
+				ProofType: proof.Type,
+				OrgId:     proof.OrgID.String(),
+			},
+		})
 	}
+	response.Included = included
 
 	ape.Render(w, response)
 }

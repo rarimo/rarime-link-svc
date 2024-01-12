@@ -24,7 +24,7 @@ type ProofQ interface {
 	Update(p *Proof) error
 	Upsert(p *Proof) error
 	Delete(p *Proof) error
-	ProofsByUserDIDCtx(ctx context.Context, userDID string) ([]Proof, error)
+	ProofsByCreatorCtx(ctx context.Context, userDID string) ([]Proof, error)
 }
 
 type LinkQ interface {

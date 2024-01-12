@@ -19,8 +19,8 @@ func (q ProofQ) SelectAllCtx(ctx context.Context) ([]*data.Proof, error) {
 	return proofs, nil
 }
 
-func (q ProofQ) ProofsByUserDIDCtx(ctx context.Context, userDID string) ([]data.Proof, error) {
-	stmt := squirrel.Select("*").From("public.proofs").Where(squirrel.Eq{"user_did": userDID})
+func (q ProofQ) ProofsByCreatorCtx(ctx context.Context, userDID string) ([]data.Proof, error) {
+	stmt := squirrel.Select("*").From("public.proofs").Where(squirrel.Eq{"creator": userDID})
 
 	var proofs []data.Proof
 

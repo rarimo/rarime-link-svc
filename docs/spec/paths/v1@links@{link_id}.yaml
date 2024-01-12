@@ -29,7 +29,6 @@ get:
                 type: array
                 items:
                   $ref: '#/components/schemas/Proof'
-
     400:
       $ref: '#/components/responses/invalidParameter'
     404:

@@ -1,5 +1,5 @@
 allOf:
-  - $ref: '#/components/schemas/ProofKey'
+  - $ref: '#/components/schemas/LinkKey'
   - type: object
     required:
       - attributes

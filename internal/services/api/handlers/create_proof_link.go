@@ -85,12 +85,12 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, resources.ProofLinkResponse{
-		Data: resources.ProofLink{
+	ape.Render(w, resources.LinkResponse{
+		Data: resources.Link{
 			Key: resources.Key{
-				Type: resources.PROOFS,
+				Type: resources.LINKS,
 			},
-			Attributes: resources.ProofLinkAttributes{
+			Attributes: resources.LinkAttributes{
 				Link:      linkID.String(),
 				CreatedAt: timestamp.String(),
 			},

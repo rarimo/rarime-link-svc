@@ -36,3 +36,41 @@ post:
     500:
       $ref: '#/components/responses/internalError'
 
+get:
+  summary: Get Proofs by User DID
+  description: >
+    Returns information about the all proofs of the user.
+  operationId: proofByUserDID
+  security:
+    - Bearer: [ ]
+  tags:
+    - Proofs
+  parameters:
+    - in: query
+      name: 'did'
+      required: true
+      description: The User DID
+      schema:
+        type: string
+        example: "did:iden3:readonly:tM1QCJ7ytcbvLB7EFQhGsJPumc11DEE18gEvAzxE7"
+  responses:
+    '200':
+      description: OK
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proof'
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'
+

@@ -40,6 +40,8 @@ func newProofCreateRequest(r *http.Request) (*proofCreateRequest, error) {
 	return &req, nil
 }
 
+// TODO add schema_url; change time format
+
 func CreateProof(w http.ResponseWriter, r *http.Request) {
 	req, err := newProofCreateRequest(r)
 	if err != nil {

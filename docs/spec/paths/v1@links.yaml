@@ -35,7 +35,6 @@ post:
               data:
                 type: object
                 $ref: '#/components/schemas/ProofLink'
-
     400:
       $ref: '#/components/responses/invalidParameter'
     401:
@@ -43,3 +42,41 @@ post:
     500:
       $ref: '#/components/responses/internalError'
 
+get:
+  summary: Get Proofs Links by User DID
+  description: >
+    Returns information about the all links of the user.
+  operationId: proofsLinksByUserDID
+  security:
+    - Bearer: [ ]
+  tags:
+    - Proofs
+  parameters:
+    - in: path
+      name: 'did'
+      required: true
+      description: The User DID
+      schema:
+        type: string
+        example: "did:iden3:readonly:tM1QCJ7ytcbvLB7EFQhGsJPumc11DEE18gEvAzxE7"
+  responses:
+    '200':
+      description: OK
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProofLink'
+
+    400:
+      $ref: '#/components/responses/invalidParameter'
+    404:
+      $ref: '#/components/responses/notFound'
+    500:
+      $ref: '#/components/responses/internalError'
