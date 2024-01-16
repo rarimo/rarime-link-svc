@@ -182,8 +182,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/poy/onpar v1.1.2 h1:QaNrNiZx0+Nar5dLgTVp5mXkyoVFIbepjyEoGSnhbAY=
 github.com/poy/onpar v1.1.2/go.mod h1:6X8FLNoxyr9kkmnlqpK6LSoiOtrO6MICtWwEuWkLjzg=
-github.com/rarimo/rarime-auth-svc v0.0.0-20240112133056-5c14a530b15f h1:lnf2esmQAAN52nbG1c2v5+SCWIq6xheF9HfgBZjhR2Q=
-github.com/rarimo/rarime-auth-svc v0.0.0-20240112133056-5c14a530b15f/go.mod h1:xtjHOQwPlTBnTa6hveACLtxjpxCcznjQB84+FmjFRBM=
+github.com/rarimo/rarime-auth-svc v0.0.1-rc3 h1:KNvI0ifbZ3//A3a4yhKELMzyOP0Y1J5CJA30f0gaRrI=
+github.com/rarimo/rarime-auth-svc v0.0.1-rc3/go.mod h1:48c8FsJixnLeWx8F8MDy79FvhU1r0oTU11mwP3JPngQ=
 github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a h1:aqz/1mU+rK/xLqf2/NHu+0fUGbVNf+9DYFI70fQo0M0=
 github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a/go.mod h1:EYFR6RRqIlnpjcl/SgPgYn8Bmw4+5itRRbPCiSylCds=
 github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
