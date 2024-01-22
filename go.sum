@@ -201,6 +201,8 @@ github.com/rarimo/rarime-auth-svc v0.0.1-rc3 h1:KNvI0ifbZ3//A3a4yhKELMzyOP0Y1J5C
 github.com/rarimo/rarime-auth-svc v0.0.1-rc3/go.mod h1:48c8FsJixnLeWx8F8MDy79FvhU1r0oTU11mwP3JPngQ=
 github.com/rarimo/rarime-auth-svc v0.0.1-rc7 h1:+ibnWRdc+fi27JrR3vOPLIXgOdePb29KyUCADt6HqeY=
 github.com/rarimo/rarime-auth-svc v0.0.1-rc7/go.mod h1:48c8FsJixnLeWx8F8MDy79FvhU1r0oTU11mwP3JPngQ=
+github.com/rarimo/rarime-auth-svc v0.0.1-rc8 h1:MBx51/ynR8BaRz5HvcbatYe4hnB2ZDVwM7cmGEepg+Y=
+github.com/rarimo/rarime-auth-svc v0.0.1-rc8/go.mod h1:48c8FsJixnLeWx8F8MDy79FvhU1r0oTU11mwP3JPngQ=
 github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a h1:aqz/1mU+rK/xLqf2/NHu+0fUGbVNf+9DYFI70fQo0M0=
 github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a/go.mod h1:EYFR6RRqIlnpjcl/SgPgYn8Bmw4+5itRRbPCiSylCds=
 github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
