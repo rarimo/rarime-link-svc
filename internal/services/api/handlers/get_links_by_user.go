@@ -54,20 +54,15 @@ func GetLinks(w http.ResponseWriter, r *http.Request) {
 
 	var response resources.LinkListResponse
 	for _, link := range proofsLinks {
-		var linkName *string
-		if link.Name.Valid {
-			linkName = &link.Name.String
-		}
 		linkResponse := resources.LinkResponse{
 			Data: resources.Link{
 				Key: resources.Key{
-					ID:   link.ID.String(),
+					ID:   link.ID,
 					Type: resources.LINKS,
 				},
 				Attributes: resources.LinkAttributes{
 					CreatedAt: link.CreatedAt,
-					Link:      link.ID.String(),
-					LinkName:  linkName,
+					Link:      link.ID,
 				},
 			},
 		}

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -59,26 +58,22 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
+		linkID         string
 		timestamp      = time.Now().UTC()
-		linkID         = uuid.New()
 		proofs         []data.Proof
 		proofNotFound  = errors.New("proof not found")
 		invalidCreator = errors.New("invalid proof creator")
-		linkNameStr    *string
 	)
 
 	err = Storage(r).LinkQ().Transaction(func(q data.LinkQ) error {
-		linkName := sql.NullString{}
+		linkID = uuid.New().String()
 		if req.Data.LinkName != nil {
-			linkName.String = *req.Data.LinkName
-			linkName.Valid = true
-			linkNameStr = req.Data.LinkName
+			linkID = *req.Data.LinkName
 		}
 		err = q.Insert(&data.Link{
 			ID:        linkID,
 			UserID:    req.Data.UserDID,
 			CreatedAt: timestamp,
-			Name:      linkName,
 		})
 		if err != nil {
 			ape.RenderErr(w, problems.InternalError())
@@ -128,9 +123,8 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 				Type: resources.LINKS,
 			},
 			Attributes: resources.LinkAttributes{
-				Link:      linkID.String(),
+				Link:      linkID,
 				CreatedAt: timestamp,
-				LinkName:  linkNameStr,
 			},
 		},
 		Included: resources.Included{},
