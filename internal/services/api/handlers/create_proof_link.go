@@ -39,7 +39,9 @@ func newProofLinkCreateRequest(r *http.Request) (*ProofLinkRequest, error) {
 			if len([]rune(*req.Data.LinkName)) > maxLinkNameLen {
 				return nil, errors.New("link name length is too big")
 			}
+			return &req, nil
 		}
+		return nil, errors.New("link name is not ASCII")
 	}
 
 	return &req, nil
