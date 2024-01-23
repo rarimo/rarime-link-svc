@@ -73,9 +73,10 @@ type GorpMigration struct {
 
 // Link represents a row from 'public.links'.
 type Link struct {
-	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
-	UserID    string    `db:"user_id" json:"user_id" structs:"user_id"`          // user_id
-	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
+	ID        uuid.UUID      `db:"id" json:"id" structs:"-"`                          // id
+	UserID    string         `db:"user_id" json:"user_id" structs:"user_id"`          // user_id
+	CreatedAt time.Time      `db:"created_at" json:"created_at" structs:"created_at"` // created_at
+	Name      sql.NullString `db:"name" json:"name" structs:"name"`                   // name
 
 }
 

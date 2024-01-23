@@ -19,3 +19,7 @@ allOf:
             format: time.Time
             description: The date and time when the proof was created in the RFC3339 format
             example: "2021-08-12T12:00:00Z"
+          link_name:
+            type: string
+            description: Link custom name
+            example: "RarimoAppTeamEmailAndPosition"

@@ -147,18 +147,18 @@ func (s Storage) LinkQ() data.LinkQ {
 	return NewLinkQ(s.DB())
 }
 
-var colsLink = `id, user_id, created_at`
+var colsLink = `id, user_id, created_at, name`
 
 // InsertCtx inserts a Link to the database.
 func (q LinkQ) InsertCtx(ctx context.Context, l *data.Link) error {
 	// sql insert query, primary key must be provided
 	sqlstr := `INSERT INTO public.links (` +
-		`id, user_id, created_at` +
+		`id, user_id, created_at, name` +
 		`) VALUES (` +
-		`$1, $2, $3` +
+		`$1, $2, $3, $4` +
 		`)`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt)
+	err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt, l.Name)
 	return errors.Wrap(err, "failed to execute insert query")
 }
 
@@ -171,10 +171,10 @@ func (q LinkQ) Insert(l *data.Link) error {
 func (q LinkQ) UpdateCtx(ctx context.Context, l *data.Link) error {
 	// update with composite primary key
 	sqlstr := `UPDATE public.links SET ` +
-		`user_id = $1 ` +
-		`WHERE id = $2`
+		`user_id = $1, name = $2 ` +
+		`WHERE id = $3`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, l.UserID, l.ID)
+	err := q.db.ExecRawContext(ctx, sqlstr, l.UserID, l.Name, l.ID)
 	return errors.Wrap(err, "failed to execute update")
 }
 
@@ -187,15 +187,15 @@ func (q LinkQ) Update(l *data.Link) error {
 func (q LinkQ) UpsertCtx(ctx context.Context, l *data.Link) error {
 	// upsert
 	sqlstr := `INSERT INTO public.links (` +
-		`id, user_id, created_at` +
+		`id, user_id, created_at, name` +
 		`) VALUES (` +
-		`$1, $2, $3` +
+		`$1, $2, $3, $4` +
 		`)` +
 		` ON CONFLICT (id) DO ` +
 		`UPDATE SET ` +
-		`user_id = EXCLUDED.user_id `
+		`user_id = EXCLUDED.user_id, name = EXCLUDED.name `
 	// run
-	if err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt); err != nil {
+	if err := q.db.ExecRawContext(ctx, sqlstr, l.ID, l.UserID, l.CreatedAt, l.Name); err != nil {
 		return errors.Wrap(err, "failed to execute upsert stmt")
 	}
 	return nil
@@ -401,13 +401,46 @@ func (q GorpMigrationQ) GorpMigrationByID(id string, isForUpdate bool) (*data.Go
 	return q.GorpMigrationByIDCtx(context.Background(), id, isForUpdate)
 }
 
+// LinkByNameCtx retrieves a row from 'public.links' as a Link.
+//
+// Generated from index 'links_name_key'.
+func (q LinkQ) LinkByNameCtx(ctx context.Context, name sql.NullString, isForUpdate bool) (*data.Link, error) {
+	// query
+	sqlstr := `SELECT ` +
+		`id, user_id, created_at, name ` +
+		`FROM public.links ` +
+		`WHERE name = $1`
+	// run
+	if isForUpdate {
+		sqlstr += " for update"
+	}
+	var res data.Link
+	err := q.db.GetRawContext(ctx, &res, sqlstr, name)
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, errors.Wrap(err, "failed to exec select")
+	}
+
+	return &res, nil
+}
+
+// LinkByName retrieves a row from 'public.links' as a Link.
+//
+// Generated from index 'links_name_key'.
+func (q LinkQ) LinkByName(name sql.NullString, isForUpdate bool) (*data.Link, error) {
+	return q.LinkByNameCtx(context.Background(), name, isForUpdate)
+}
+
 // LinkByIDCtx retrieves a row from 'public.links' as a Link.
 //
 // Generated from index 'links_pkey'.
 func (q LinkQ) LinkByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Link, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, user_id, created_at ` +
+		`id, user_id, created_at, name ` +
 		`FROM public.links ` +
 		`WHERE id = $1`
 	// run

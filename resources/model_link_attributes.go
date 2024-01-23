@@ -11,4 +11,6 @@ type LinkAttributes struct {
 	CreatedAt time.Time `json:"created_at"`
 	// UUID Link to proofs
 	Link string `json:"link"`
+	// Link custom name
+	LinkName *string `json:"link_name,omitempty"`
 }

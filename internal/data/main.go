@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -37,6 +38,7 @@ type LinkQ interface {
 	Transaction(fn func(db LinkQ) error) error
 	InsertCtxLinkToProof(ctx context.Context, linksToProof LinksToProof) error
 	GetProofsLinksByUserID(ctx context.Context, userID string) ([]*Link, error)
+	LinkByName(name sql.NullString, isForUpdate bool) (*Link, error)
 }
 
 type LinksToProofQ interface {
