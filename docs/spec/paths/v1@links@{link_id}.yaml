@@ -4,7 +4,7 @@ get:
     Returns information about the all proofs of the link.
   operationId: proofsByLinkID
   tags:
-    - Proofs
+    - Links
   parameters:
     - in: path
       name: 'link_id'

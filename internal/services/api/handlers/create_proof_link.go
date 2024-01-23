@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -78,6 +79,10 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 			CreatedAt: timestamp,
 		})
 		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				ape.RenderErr(w, problems.Conflict())
+				return err
+			}
 			ape.RenderErr(w, problems.InternalError())
 			return err
 		}

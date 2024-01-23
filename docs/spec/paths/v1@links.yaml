@@ -1,6 +1,6 @@
 post:
   tags:
-    - Proofs
+    - Links
   summary: Create Link Proofs
   description: |
     Add link to the specified proofs
@@ -47,6 +47,8 @@ post:
       $ref: '#/components/responses/invalidParameter'
     401:
       $ref: '#/components/responses/invalidAuth'
+    409:
+      $ref: '#/components/responses/conflict'
     500:
       $ref: '#/components/responses/internalError'
 
@@ -58,7 +60,7 @@ get:
   security:
     - Bearer: [ ]
   tags:
-    - Proofs
+    - Links
   parameters:
     - in: path
       name: 'did'
