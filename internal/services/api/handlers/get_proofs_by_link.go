@@ -101,6 +101,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
 				SchemaUrl: proof.SchemaURL,
+				Operator:  proof.Operator.String(),
 			},
 		})
 	}

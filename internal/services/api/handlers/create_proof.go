@@ -38,6 +38,12 @@ func newProofCreateRequest(r *http.Request) (*proofCreateRequest, error) {
 		}
 	}
 
+	if err := validation.Validate(req.Data.Operator, ValidationOperator); err != nil {
+		return nil, validation.Errors{
+			"data/operator": errors.Wrap(err, "invalid operator value"),
+		}
+	}
+
 	return &req, nil
 }
 
@@ -67,6 +73,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		Type:      req.Data.ProofType,
 		OrgID:     orgID,
 		SchemaURL: req.Data.SchemaUrl,
+		Operator:  data.MustProofOperatorFromString(req.Data.Operator),
 	}
 
 	err = Storage(r).ProofQ().Insert(&proof)
@@ -89,6 +96,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
 				SchemaUrl: req.Data.SchemaUrl,
+				Operator:  proof.Operator.String(),
 			},
 		},
 		Included: resources.Included{},

@@ -88,12 +88,13 @@ type LinksToProof struct {
 
 // Proof represents a row from 'public.proofs'.
 type Proof struct {
-	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
-	Creator   string    `db:"creator" json:"creator" structs:"creator"`          // creator
-	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
-	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
-	OrgID     uuid.UUID `db:"org_id" json:"org_id" structs:"org_id"`             // org_id
-	Type      string    `db:"type" json:"type" structs:"type"`                   // type
-	SchemaURL string    `db:"schema_url" json:"schema_url" structs:"schema_url"` // schema_url
+	ID        uuid.UUID     `db:"id" json:"id" structs:"-"`                          // id
+	Creator   string        `db:"creator" json:"creator" structs:"creator"`          // creator
+	CreatedAt time.Time     `db:"created_at" json:"created_at" structs:"created_at"` // created_at
+	Proof     xo.Jsonb      `db:"proof" json:"proof" structs:"proof"`                // proof
+	OrgID     uuid.UUID     `db:"org_id" json:"org_id" structs:"org_id"`             // org_id
+	Type      string        `db:"type" json:"type" structs:"type"`                   // type
+	SchemaURL string        `db:"schema_url" json:"schema_url" structs:"schema_url"` // schema_url
+	Operator  ProofOperator `db:"operator" json:"operator" structs:"operator"`       // operator
 
 }

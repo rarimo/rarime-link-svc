@@ -2,11 +2,12 @@ package proofs_cleaner
 
 import (
 	"context"
+	"time"
+
 	"github.com/rarimo/rarime-link-svc/internal/config"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
-	"time"
 )
 
 type ProofsCleaner struct {

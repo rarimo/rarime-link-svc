@@ -5,6 +5,8 @@
 package resources
 
 type ProofCreate struct {
+	// The operator that will be used to check the proof
+	Operator string `json:"operator"`
 	// The ID of the organization that issued the proof's claim
 	OrgId string `json:"org_id"`
 	// The proof object in JSON string format

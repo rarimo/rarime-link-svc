@@ -13,6 +13,7 @@ allOf:
           - proof_type
           - org_id
           - schema_url
+          - operator
         properties:
           creator:
             type: string
@@ -35,3 +36,7 @@ allOf:
           schema_url:
             type: string
             description: The schema URL of the claim the proof was created based on
+          operator:
+            type: string
+            description: The operator that will be used to check the proof
+            example: "$eq"
