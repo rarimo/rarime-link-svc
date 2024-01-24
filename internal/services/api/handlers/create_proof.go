@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"net/http"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
