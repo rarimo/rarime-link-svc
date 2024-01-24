@@ -520,7 +520,8 @@
                   "proof",
                   "proof_type",
                   "org_id",
-                  "schema_url"
+                  "schema_url",
+                  "operator"
                 ],
                 "properties": {
                   "creator": {
@@ -549,6 +550,11 @@
                   "schema_url": {
                     "type": "string",
                     "description": "The schema URL of the claim the proof was created based on"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "description": "The operator that will be used to check the proof",
+                    "example": "$eq"
                   }
                 }
               }
@@ -563,7 +569,8 @@
           "proof_type",
           "org_id",
           "user_did",
-          "schema_url"
+          "schema_url",
+          "operator"
         ],
         "properties": {
           "user_did": {
@@ -586,6 +593,10 @@
           "schema_url": {
             "type": "string",
             "description": "The schema URL of the claim the proof was created based on"
+          },
+          "operator": {
+            "type": "string",
+            "description": "The operator that will be used to check the proof"
           }
         }
       },
