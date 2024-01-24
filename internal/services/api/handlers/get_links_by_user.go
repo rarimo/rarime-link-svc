@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"context"
+	"net/http"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/urlval"
-	"net/http"
 )
 
 type proofsLinksByUserDIDRequest struct {
@@ -31,6 +32,11 @@ func GetLinks(w http.ResponseWriter, r *http.Request) {
 	req, err := newGetLinksRequest(r)
 	if err != nil {
 		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
+	}
+
+	if !auth.Authenticates(UserClaim(r), auth.UserGrant(req.UserDid)) {
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 
