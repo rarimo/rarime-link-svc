@@ -73,7 +73,7 @@ type GorpMigration struct {
 
 // Link represents a row from 'public.links'.
 type Link struct {
-	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
+	ID        string    `db:"id" json:"id" structs:"-"`                          // id
 	UserID    string    `db:"user_id" json:"user_id" structs:"user_id"`          // user_id
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 
@@ -81,19 +81,20 @@ type Link struct {
 
 // LinksToProof represents a row from 'public.links_to_proofs'.
 type LinksToProof struct {
-	LinkID  uuid.UUID `db:"link_id" json:"link_id" structs:"-"`   // link_id
+	LinkID  string    `db:"link_id" json:"link_id" structs:"-"`   // link_id
 	ProofID uuid.UUID `db:"proof_id" json:"proof_id" structs:"-"` // proof_id
 
 }
 
 // Proof represents a row from 'public.proofs'.
 type Proof struct {
-	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
-	Creator   string    `db:"creator" json:"creator" structs:"creator"`          // creator
-	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
-	Proof     xo.Jsonb  `db:"proof" json:"proof" structs:"proof"`                // proof
-	OrgID     uuid.UUID `db:"org_id" json:"org_id" structs:"org_id"`             // org_id
-	Type      string    `db:"type" json:"type" structs:"type"`                   // type
-	SchemaURL string    `db:"schema_url" json:"schema_url" structs:"schema_url"` // schema_url
+	ID        uuid.UUID     `db:"id" json:"id" structs:"-"`                          // id
+	Creator   string        `db:"creator" json:"creator" structs:"creator"`          // creator
+	CreatedAt time.Time     `db:"created_at" json:"created_at" structs:"created_at"` // created_at
+	Proof     xo.Jsonb      `db:"proof" json:"proof" structs:"proof"`                // proof
+	OrgID     uuid.UUID     `db:"org_id" json:"org_id" structs:"org_id"`             // org_id
+	Type      string        `db:"type" json:"type" structs:"type"`                   // type
+	SchemaURL string        `db:"schema_url" json:"schema_url" structs:"schema_url"` // schema_url
+	Operator  ProofOperator `db:"operator" json:"operator" structs:"operator"`       // operator
 
 }

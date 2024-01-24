@@ -35,7 +35,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	link, err := Storage(r).LinkQ().LinkByID(req.LinkID, false)
+	link, err := Storage(r).LinkQ().LinkByID(req.LinkID.String(), false)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get link by UUID")
 		ape.RenderErr(w, problems.InternalError())
@@ -47,7 +47,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	links, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), req.LinkID)
+	links, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), req.LinkID.String())
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get link to proofs")
 		ape.RenderErr(w, problems.InternalError())
@@ -62,12 +62,12 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 	response := resources.LinkResponse{
 		Data: resources.Link{
 			Key: resources.Key{
-				ID:   link.ID.String(),
+				ID:   link.ID,
 				Type: resources.LINKS,
 			},
 			Attributes: resources.LinkAttributes{
 				CreatedAt: link.CreatedAt,
-				Link:      link.ID.String(),
+				Link:      link.ID,
 			},
 		},
 	}
@@ -92,6 +92,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
 				SchemaUrl: proof.SchemaURL,
+				Operator:  proof.Operator.String(),
 			},
 		})
 	}

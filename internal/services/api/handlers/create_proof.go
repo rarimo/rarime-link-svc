@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"net/http"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
-	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
@@ -35,6 +35,12 @@ func newProofCreateRequest(r *http.Request) (*proofCreateRequest, error) {
 	if req.Data.ProofType == "" {
 		return nil, validation.Errors{
 			"type": errors.New("type is required"),
+		}
+	}
+
+	if err := validation.Validate(req.Data.Operator, ValidationOperator); err != nil {
+		return nil, validation.Errors{
+			"data/operator": errors.Wrap(err, "invalid operator value"),
 		}
 	}
 
@@ -67,6 +73,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		Type:      req.Data.ProofType,
 		OrgID:     orgID,
 		SchemaURL: req.Data.SchemaUrl,
+		Operator:  data.MustProofOperatorFromString(req.Data.Operator),
 	}
 
 	err = Storage(r).ProofQ().Insert(&proof)
@@ -89,6 +96,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 				ProofType: proof.Type,
 				OrgId:     proof.OrgID.String(),
 				SchemaUrl: req.Data.SchemaUrl,
+				Operator:  proof.Operator.String(),
 			},
 		},
 		Included: resources.Included{},

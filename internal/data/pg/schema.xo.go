@@ -292,18 +292,18 @@ func (s Storage) ProofQ() data.ProofQ {
 	return NewProofQ(s.DB())
 }
 
-var colsProof = `id, creator, created_at, proof, org_id, type, schema_url`
+var colsProof = `id, creator, created_at, proof, org_id, type, schema_url, operator`
 
 // InsertCtx inserts a Proof to the database.
 func (q ProofQ) InsertCtx(ctx context.Context, p *data.Proof) error {
 	// sql insert query, primary key must be provided
 	sqlstr := `INSERT INTO public.proofs (` +
-		`id, creator, created_at, proof, org_id, type, schema_url` +
+		`id, creator, created_at, proof, org_id, type, schema_url, operator` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7` +
+		`$1, $2, $3, $4, $5, $6, $7, $8` +
 		`)`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.OrgID, p.Type, p.SchemaURL)
+	err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.OrgID, p.Type, p.SchemaURL, p.Operator)
 	return errors.Wrap(err, "failed to execute insert query")
 }
 
@@ -316,10 +316,10 @@ func (q ProofQ) Insert(p *data.Proof) error {
 func (q ProofQ) UpdateCtx(ctx context.Context, p *data.Proof) error {
 	// update with composite primary key
 	sqlstr := `UPDATE public.proofs SET ` +
-		`creator = $1, proof = $2, org_id = $3, type = $4, schema_url = $5 ` +
-		`WHERE id = $6`
+		`creator = $1, proof = $2, org_id = $3, type = $4, schema_url = $5, operator = $6 ` +
+		`WHERE id = $7`
 	// run
-	err := q.db.ExecRawContext(ctx, sqlstr, p.Creator, p.Proof, p.OrgID, p.Type, p.SchemaURL, p.ID)
+	err := q.db.ExecRawContext(ctx, sqlstr, p.Creator, p.Proof, p.OrgID, p.Type, p.SchemaURL, p.Operator, p.ID)
 	return errors.Wrap(err, "failed to execute update")
 }
 
@@ -332,15 +332,15 @@ func (q ProofQ) Update(p *data.Proof) error {
 func (q ProofQ) UpsertCtx(ctx context.Context, p *data.Proof) error {
 	// upsert
 	sqlstr := `INSERT INTO public.proofs (` +
-		`id, creator, created_at, proof, org_id, type, schema_url` +
+		`id, creator, created_at, proof, org_id, type, schema_url, operator` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7` +
+		`$1, $2, $3, $4, $5, $6, $7, $8` +
 		`)` +
 		` ON CONFLICT (id) DO ` +
 		`UPDATE SET ` +
-		`creator = EXCLUDED.creator, proof = EXCLUDED.proof, org_id = EXCLUDED.org_id, type = EXCLUDED.type, schema_url = EXCLUDED.schema_url `
+		`creator = EXCLUDED.creator, proof = EXCLUDED.proof, org_id = EXCLUDED.org_id, type = EXCLUDED.type, schema_url = EXCLUDED.schema_url, operator = EXCLUDED.operator `
 	// run
-	if err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.OrgID, p.Type, p.SchemaURL); err != nil {
+	if err := q.db.ExecRawContext(ctx, sqlstr, p.ID, p.Creator, p.CreatedAt, p.Proof, p.OrgID, p.Type, p.SchemaURL, p.Operator); err != nil {
 		return errors.Wrap(err, "failed to execute upsert stmt")
 	}
 	return nil
@@ -404,7 +404,7 @@ func (q GorpMigrationQ) GorpMigrationByID(id string, isForUpdate bool) (*data.Go
 // LinkByIDCtx retrieves a row from 'public.links' as a Link.
 //
 // Generated from index 'links_pkey'.
-func (q LinkQ) LinkByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Link, error) {
+func (q LinkQ) LinkByIDCtx(ctx context.Context, id string, isForUpdate bool) (*data.Link, error) {
 	// query
 	sqlstr := `SELECT ` +
 		`id, user_id, created_at ` +
@@ -430,14 +430,14 @@ func (q LinkQ) LinkByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) 
 // LinkByID retrieves a row from 'public.links' as a Link.
 //
 // Generated from index 'links_pkey'.
-func (q LinkQ) LinkByID(id uuid.UUID, isForUpdate bool) (*data.Link, error) {
+func (q LinkQ) LinkByID(id string, isForUpdate bool) (*data.Link, error) {
 	return q.LinkByIDCtx(context.Background(), id, isForUpdate)
 }
 
 // LinksToProofByLinkIDProofIDCtx retrieves a row from 'public.links_to_proofs' as a LinksToProof.
 //
 // Generated from index 'links_to_proofs_pkey'.
-func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
+func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID string, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
 	// query
 	sqlstr := `SELECT ` +
 		`link_id, proof_id ` +
@@ -463,7 +463,7 @@ func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkI
 // LinksToProofByLinkIDProofID retrieves a row from 'public.links_to_proofs' as a LinksToProof.
 //
 // Generated from index 'links_to_proofs_pkey'.
-func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
+func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID string, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
 	return q.LinksToProofByLinkIDProofIDCtx(context.Background(), linkID, proofID, isForUpdate)
 }
 
@@ -473,7 +473,7 @@ func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID, proofID uuid.UUID, is
 func (q ProofQ) ProofByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Proof, error) {
 	// query
 	sqlstr := `SELECT ` +
-		`id, creator, created_at, proof, org_id, type, schema_url ` +
+		`id, creator, created_at, proof, org_id, type, schema_url, operator ` +
 		`FROM public.proofs ` +
 		`WHERE id = $1`
 	// run

@@ -55,7 +55,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 
 	err = Storage(r).LinkQ().Transaction(func(q data.LinkQ) error {
 		err = q.Insert(&data.Link{
-			ID:        linkID,
+			ID:        linkID.String(),
 			UserID:    req.Data.UserDID,
 			CreatedAt: timestamp,
 		})
@@ -85,7 +85,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 			proofs = append(proofs, *p)
 
 			err = q.InsertCtxLinkToProof(r.Context(), data.LinksToProof{
-				LinkID:  linkID,
+				LinkID:  linkID.String(),
 				ProofID: proofID,
 			})
 

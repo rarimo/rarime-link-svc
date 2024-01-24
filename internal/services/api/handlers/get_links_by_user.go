@@ -51,12 +51,12 @@ func GetLinks(w http.ResponseWriter, r *http.Request) {
 		linkResponse := resources.LinkResponse{
 			Data: resources.Link{
 				Key: resources.Key{
-					ID:   link.ID.String(),
+					ID:   link.ID,
 					Type: resources.LINKS,
 				},
 				Attributes: resources.LinkAttributes{
 					CreatedAt: link.CreatedAt,
-					Link:      link.ID.String(),
+					Link:      link.ID,
 				},
 			},
 		}
