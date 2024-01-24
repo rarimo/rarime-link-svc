@@ -10,7 +10,7 @@ paths:
   /v1/links:
     post:
       tags:
-        - Proofs
+        - Links
       summary: Create Link Proofs
       description: |
         Add link to the specified proofs
@@ -38,7 +38,12 @@ paths:
                         - 550e8400-e29b-41d4-a716-446655440001
                         - 550e8400-e29b-41d4-a716-446655440002
                         - 550e8400-e29b-41d4-a716-446655440003
+                    link_name:
+                      type: string
+                      description: 'Link name, must be unique'
+                      example: RarimoAppTeamEmailAndPosition
                   required:
+                    - user_did
                     - proofs_ids
       responses:
         '200':
@@ -55,6 +60,8 @@ paths:
           $ref: '#/components/responses/invalidParameter'
         '401':
           $ref: '#/components/responses/invalidAuth'
+        '409':
+          $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalError'
     get:
@@ -65,7 +72,7 @@ paths:
       security:
         - Bearer: []
       tags:
-        - Proofs
+        - Links
       parameters:
         - in: path
           name: did
@@ -101,12 +108,12 @@ paths:
         Returns information about the all proofs of the link.
       operationId: proofsByLinkID
       tags:
-        - Proofs
+        - Links
       parameters:
         - in: path
           name: link_id
           required: true
-          description: The Link ID
+          description: The Link ID (UUID or ASCII string)
           schema:
             type: string
             example: 550e8400-e29b-41d4-a716-446655440000
@@ -304,7 +311,7 @@ components:
               properties:
                 link:
                   type: string
-                  description: UUID Link to proofs
+                  description: Link to proofs ID (UUID or custom ASCII string)
                   example: 05260b49-2c35-48b9-8300-d39ae48ca312
                 created_at:
                   type: string
@@ -401,6 +408,12 @@ components:
           enum:
             - proofs
   responses:
+    conflict:
+      description: Conflict
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
     internalError:
       description: Internal server error
       content:
