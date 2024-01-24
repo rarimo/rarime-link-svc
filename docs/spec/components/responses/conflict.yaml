@@ -1,0 +1,5 @@
+description: Conflict
+content:
+  application/vnd.api+json:
+    schema:
+      $ref: '#/components/schemas/Errors'

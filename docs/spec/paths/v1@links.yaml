@@ -1,6 +1,6 @@
 post:
   tags:
-    - Proofs
+    - Links
   summary: Create Link Proofs
   description: |
     Add link to the specified proofs
@@ -25,7 +25,12 @@ post:
                   items:
                     type: string
                   example: [550e8400-e29b-41d4-a716-446655440001, 550e8400-e29b-41d4-a716-446655440002, 550e8400-e29b-41d4-a716-446655440003]
+                link_name:
+                  type: string
+                  description: Link name, must be unique
+                  example: "RarimoAppTeamEmailAndPosition"
               required:
+                - user_did
                 - proofs_ids
   responses:
     200:
@@ -42,6 +47,8 @@ post:
       $ref: '#/components/responses/invalidParameter'
     401:
       $ref: '#/components/responses/invalidAuth'
+    409:
+      $ref: '#/components/responses/conflict'
     500:
       $ref: '#/components/responses/internalError'
 
@@ -53,7 +60,7 @@ get:
   security:
     - Bearer: [ ]
   tags:
-    - Proofs
+    - Links
   parameters:
     - in: path
       name: 'did'

@@ -5,17 +5,18 @@ create table if not exists proofs(
     created_at timestamp without time zone not null default now(),
     proof      jsonb not null,
     org_id     uuid not null,
-    type       text not null
+    type       text not null,
+    schema_url text not null
 );
 
 create table if not exists links(
-    id         uuid primary key not null,
+    id         text primary key not null,
     user_id    text             not null,
     created_at timestamp        not null default current_timestamp
 );
 
 create table if not exists links_to_proofs(
-    link_id  uuid not null,
+    link_id  text not null,
     proof_id uuid not null,
     primary key (link_id, proof_id),
     foreign key (link_id) references links(id) on delete cascade,

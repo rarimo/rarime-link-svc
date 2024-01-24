@@ -1,31 +1,40 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"net/http"
+	"golang.org/x/exp/utf8string"
 )
 
 type proofsByLinkID struct {
-	LinkID uuid.UUID
+	linkID string
 }
 
 func newLinkByIDRequest(r *http.Request) (proofsByLinkID, error) {
 	linkID := chi.URLParam(r, "link_id")
 	if linkID == "" {
-		return proofsByLinkID{}, errors.New("user_did is required")
+		return proofsByLinkID{}, errors.New("link_id is required")
 	}
 
 	uuidLinkID, err := uuid.Parse(linkID)
 	if err != nil {
+		if utf8string.NewString(linkID).IsASCII() {
+			return proofsByLinkID{
+				linkID: linkID,
+			}, nil
+		}
 		return proofsByLinkID{}, errors.New("invalid link_id")
 	}
 
-	return proofsByLinkID{uuidLinkID}, nil
+	return proofsByLinkID{
+		linkID: uuidLinkID.String(),
+	}, nil
 }
 
 func GetLinkByID(w http.ResponseWriter, r *http.Request) {
@@ -35,26 +44,26 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	link, err := Storage(r).LinkQ().LinkByID(req.LinkID, false)
+	link, err := Storage(r).LinkQ().LinkByID(req.linkID, false)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get link by UUID")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if link == nil {
-		Log(r).WithField("link_id", req.LinkID).Warn("link not found")
+		Log(r).WithField("link_id", req.linkID).Warn("link not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
-	links, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), req.LinkID)
+	links, err := Storage(r).LinksToProofQ().GetLinksToProofsByLinkID(r.Context(), link.ID)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get link to proofs")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if len(links) == 0 {
-		Log(r).WithField("link_id", req.LinkID).Warn("links not found")
+		Log(r).WithField("link_id", req.linkID).Warn("links not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -62,12 +71,12 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 	response := resources.LinkResponse{
 		Data: resources.Link{
 			Key: resources.Key{
-				ID:   link.ID.String(),
+				ID:   link.ID,
 				Type: resources.LINKS,
 			},
 			Attributes: resources.LinkAttributes{
 				CreatedAt: link.CreatedAt,
-				Link:      link.ID.String(),
+				Link:      link.ID,
 			},
 		},
 	}

@@ -4,13 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/rarimo/rarime-link-svc/internal/services/proofs_cleaner"
-	"gitlab.com/distributed_lab/logan/v3"
-
 	"github.com/go-chi/chi"
 	"github.com/rarimo/rarime-link-svc/internal/config"
 	"github.com/rarimo/rarime-link-svc/internal/services/api/handlers"
+	"github.com/rarimo/rarime-link-svc/internal/services/proofs_cleaner"
 	"gitlab.com/distributed_lab/ape"
+	"gitlab.com/distributed_lab/logan/v3"
 )
 
 func Run(ctx context.Context, cfg config.Config) {
@@ -34,29 +33,31 @@ func Run(ctx context.Context, cfg config.Config) {
 		),
 	)
 
-	r.Route("/v1", func(r chi.Router) {
-		r.Route("/proofs", func(r chi.Router) {
-			r.Group(func(r chi.Router) {
-				r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
-				r.Get("/", handlers.GetProofs)
-				r.Post("/", handlers.CreateProof)
+	r.Route("/integrations/rarime-link-svc", func(r chi.Router) {
+		r.Route("/v1", func(r chi.Router) {
+			r.Route("/proofs", func(r chi.Router) {
+				r.Group(func(r chi.Router) {
+					r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
+					r.Get("/", handlers.GetProofs)
+					r.Post("/", handlers.CreateProof)
+				})
+
+				r.Route("/{id}", func(r chi.Router) {
+					r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
+					r.Get("/", handlers.ProofByID)
+				})
 			})
 
-			r.Route("/{id}", func(r chi.Router) {
-				r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
-				r.Get("/", handlers.ProofByID)
-			})
-		})
+			r.Route("/links", func(r chi.Router) {
+				r.Group(func(r chi.Router) {
+					r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
+					r.Get("/", handlers.GetLinks)
+					r.Post("/", handlers.CreateProofLink)
+				})
 
-		r.Route("/links", func(r chi.Router) {
-			r.Group(func(r chi.Router) {
-				r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
-				r.Get("/", handlers.GetLinks)
-				r.Post("/", handlers.CreateProofLink)
-			})
-
-			r.Route("/{link_id}", func(r chi.Router) {
-				r.Get("/", handlers.GetLinkByID)
+				r.Route("/{link_id}", func(r chi.Router) {
+					r.Get("/", handlers.GetLinkByID)
+				})
 			})
 		})
 	})

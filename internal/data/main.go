@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 )
 
@@ -33,7 +32,7 @@ type LinkQ interface {
 	Upsert(l *Link) error
 	Delete(l *Link) error
 	SelectAllCtx(ctx context.Context) ([]*Link, error)
-	LinkByID(id uuid.UUID, isForUpdate bool) (*Link, error)
+	LinkByID(id string, isForUpdate bool) (*Link, error)
 	Transaction(fn func(db LinkQ) error) error
 	InsertCtxLinkToProof(ctx context.Context, linksToProof LinksToProof) error
 	GetProofsLinksByUserID(ctx context.Context, userID string) ([]*Link, error)
@@ -42,9 +41,9 @@ type LinkQ interface {
 type LinksToProofQ interface {
 	Insert(l *LinksToProof) error
 	Delete(l *LinksToProof) error
-	LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID, proofID uuid.UUID, isForUpdate bool) (*LinksToProof, error)
+	LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID string, proofID uuid.UUID, isForUpdate bool) (*LinksToProof, error)
 	SelectAllCtx(ctx context.Context) ([]*LinksToProofQ, error)
-	GetLinksToProofsByLinkID(ctx context.Context, linkID uuid.UUID) ([]*LinksToProof, error)
+	GetLinksToProofsByLinkID(ctx context.Context, linkID string) ([]*LinksToProof, error)
 	GetLinksToProofsByProofID(ctx context.Context, proofID uuid.UUID) ([]*LinksToProof, error)
 }
 

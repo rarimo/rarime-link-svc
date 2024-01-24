@@ -73,7 +73,7 @@ type GorpMigration struct {
 
 // Link represents a row from 'public.links'.
 type Link struct {
-	ID        uuid.UUID `db:"id" json:"id" structs:"-"`                          // id
+	ID        string    `db:"id" json:"id" structs:"-"`                          // id
 	UserID    string    `db:"user_id" json:"user_id" structs:"user_id"`          // user_id
 	CreatedAt time.Time `db:"created_at" json:"created_at" structs:"created_at"` // created_at
 
@@ -81,7 +81,7 @@ type Link struct {
 
 // LinksToProof represents a row from 'public.links_to_proofs'.
 type LinksToProof struct {
-	LinkID  uuid.UUID `db:"link_id" json:"link_id" structs:"-"`   // link_id
+	LinkID  string    `db:"link_id" json:"link_id" structs:"-"`   // link_id
 	ProofID uuid.UUID `db:"proof_id" json:"proof_id" structs:"-"` // proof_id
 
 }

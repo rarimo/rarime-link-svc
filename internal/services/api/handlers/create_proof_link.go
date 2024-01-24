@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,11 +13,15 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+	"golang.org/x/exp/utf8string"
 )
+
+const maxLinkNameLen = 50
 
 type ProofLink struct {
 	UserDID   string      `json:"user_did"`
 	ProofsIds []uuid.UUID `json:"proofs_ids"`
+	LinkName  *string     `json:"link_name,omitempty"`
 }
 
 type ProofLinkRequest struct {
@@ -28,6 +33,16 @@ func newProofLinkCreateRequest(r *http.Request) (*ProofLinkRequest, error) {
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, errors.Wrap(err, "failed to decode body")
+	}
+
+	if req.Data.LinkName != nil {
+		if utf8string.NewString(*req.Data.LinkName).IsASCII() {
+			if len([]rune(*req.Data.LinkName)) > maxLinkNameLen {
+				return nil, errors.New("link name length is too big")
+			}
+			return &req, nil
+		}
+		return nil, errors.New("link name is not ASCII")
 	}
 
 	return &req, nil
@@ -46,21 +61,28 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
+		linkID         string
 		timestamp      = time.Now().UTC()
-		linkID         = uuid.New()
 		proofs         []data.Proof
 		proofNotFound  = errors.New("proof not found")
 		invalidCreator = errors.New("invalid proof creator")
 	)
 
 	err = Storage(r).LinkQ().Transaction(func(q data.LinkQ) error {
+		linkID = uuid.New().String()
+		if req.Data.LinkName != nil {
+			linkID = *req.Data.LinkName
+		}
 		err = q.Insert(&data.Link{
 			ID:        linkID,
 			UserID:    req.Data.UserDID,
 			CreatedAt: timestamp,
 		})
-
 		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				ape.RenderErr(w, problems.Conflict())
+				return err
+			}
 			ape.RenderErr(w, problems.InternalError())
 			return err
 		}
@@ -71,7 +93,6 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 				ape.RenderErr(w, problems.InternalError())
 				return err
 			}
-
 			if p == nil {
 				ape.RenderErr(w, problems.NotFound())
 				return proofNotFound
@@ -88,7 +109,6 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 				LinkID:  linkID,
 				ProofID: proofID,
 			})
-
 			if err != nil {
 				ape.RenderErr(w, problems.InternalError())
 				return err
@@ -110,7 +130,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 				Type: resources.LINKS,
 			},
 			Attributes: resources.LinkAttributes{
-				Link:      linkID.String(),
+				Link:      linkID,
 				CreatedAt: timestamp,
 			},
 		},

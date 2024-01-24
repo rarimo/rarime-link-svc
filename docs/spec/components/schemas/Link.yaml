@@ -12,7 +12,7 @@ allOf:
         properties:
           link:
             type: string
-            description: UUID Link to proofs
+            description: Link to proofs ID (UUID or custom ASCII string)
             example: '05260b49-2c35-48b9-8300-d39ae48ca312'
           created_at:
             type: string

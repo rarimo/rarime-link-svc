@@ -20,7 +20,7 @@ func (q LinksToProofQ) SelectAllCtx(ctx context.Context) ([]*data.LinksToProofQ,
 	return links, nil
 }
 
-func (q LinksToProofQ) GetLinksToProofsByLinkID(ctx context.Context, linkID uuid.UUID) ([]*data.LinksToProof, error) {
+func (q LinksToProofQ) GetLinksToProofsByLinkID(ctx context.Context, linkID string) ([]*data.LinksToProof, error) {
 	stmt := squirrel.Select("*").
 		From("public.links_to_proofs").
 		Where(squirrel.Eq{"link_id": linkID})

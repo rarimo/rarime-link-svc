@@ -404,7 +404,7 @@ func (q GorpMigrationQ) GorpMigrationByID(id string, isForUpdate bool) (*data.Go
 // LinkByIDCtx retrieves a row from 'public.links' as a Link.
 //
 // Generated from index 'links_pkey'.
-func (q LinkQ) LinkByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) (*data.Link, error) {
+func (q LinkQ) LinkByIDCtx(ctx context.Context, id string, isForUpdate bool) (*data.Link, error) {
 	// query
 	sqlstr := `SELECT ` +
 		`id, user_id, created_at ` +
@@ -430,14 +430,14 @@ func (q LinkQ) LinkByIDCtx(ctx context.Context, id uuid.UUID, isForUpdate bool) 
 // LinkByID retrieves a row from 'public.links' as a Link.
 //
 // Generated from index 'links_pkey'.
-func (q LinkQ) LinkByID(id uuid.UUID, isForUpdate bool) (*data.Link, error) {
+func (q LinkQ) LinkByID(id string, isForUpdate bool) (*data.Link, error) {
 	return q.LinkByIDCtx(context.Background(), id, isForUpdate)
 }
 
 // LinksToProofByLinkIDProofIDCtx retrieves a row from 'public.links_to_proofs' as a LinksToProof.
 //
 // Generated from index 'links_to_proofs_pkey'.
-func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
+func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkID string, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
 	// query
 	sqlstr := `SELECT ` +
 		`link_id, proof_id ` +
@@ -463,7 +463,7 @@ func (q LinksToProofQ) LinksToProofByLinkIDProofIDCtx(ctx context.Context, linkI
 // LinksToProofByLinkIDProofID retrieves a row from 'public.links_to_proofs' as a LinksToProof.
 //
 // Generated from index 'links_to_proofs_pkey'.
-func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
+func (q LinksToProofQ) LinksToProofByLinkIDProofID(linkID string, proofID uuid.UUID, isForUpdate bool) (*data.LinksToProof, error) {
 	return q.LinksToProofByLinkIDProofIDCtx(context.Background(), linkID, proofID, isForUpdate)
 }
 
