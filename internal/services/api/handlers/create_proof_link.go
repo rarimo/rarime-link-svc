@@ -74,7 +74,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 			linkID = *req.Data.LinkName
 		}
 		err = q.Insert(&data.Link{
-			ID:        linkID.String(),
+			ID:        linkID,
 			UserID:    req.Data.UserDID,
 			CreatedAt: timestamp,
 		})
@@ -106,7 +106,7 @@ func CreateProofLink(w http.ResponseWriter, r *http.Request) {
 			proofs = append(proofs, *p)
 
 			err = q.InsertCtxLinkToProof(r.Context(), data.LinksToProof{
-				LinkID:  linkID.String(),
+				LinkID:  linkID,
 				ProofID: proofID,
 			})
 			if err != nil {
