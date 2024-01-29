@@ -521,7 +521,8 @@
                   "proof_type",
                   "org_id",
                   "schema_url",
-                  "operator"
+                  "operator",
+                  "field"
                 ],
                 "properties": {
                   "creator": {
@@ -555,6 +556,11 @@
                     "type": "string",
                     "description": "The operator that will be used to check the proof",
                     "example": "$eq"
+                  },
+                  "field": {
+                    "type": "string",
+                    "description": "The field that will be checked",
+                    "example": "groupID"
                   }
                 }
               }
@@ -570,7 +576,8 @@
           "org_id",
           "user_did",
           "schema_url",
-          "operator"
+          "operator",
+          "field"
         ],
         "properties": {
           "user_did": {
@@ -597,6 +604,11 @@
           "operator": {
             "type": "string",
             "description": "The operator that will be used to check the proof"
+          },
+          "field": {
+            "type": "string",
+            "description": "The field that will be checked",
+            "example": "groupID"
           }
         }
       },

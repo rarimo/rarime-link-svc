@@ -348,6 +348,7 @@ components:
                 - org_id
                 - schema_url
                 - operator
+                - field
               properties:
                 creator:
                   type: string
@@ -374,6 +375,10 @@ components:
                   type: string
                   description: The operator that will be used to check the proof
                   example: $eq
+                field:
+                  type: string
+                  description: The field that will be checked
+                  example: groupID
     ProofCreate:
       type: object
       required:
@@ -383,6 +388,7 @@ components:
         - user_did
         - schema_url
         - operator
+        - field
       properties:
         user_did:
           type: string
@@ -403,6 +409,10 @@ components:
         operator:
           type: string
           description: The operator that will be used to check the proof
+        field:
+          type: string
+          description: The field that will be checked
+          example: groupID
     ProofKey:
       type: object
       required:
