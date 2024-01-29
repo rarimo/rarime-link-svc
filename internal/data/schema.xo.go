@@ -96,5 +96,6 @@ type Proof struct {
 	Type      string        `db:"type" json:"type" structs:"type"`                   // type
 	SchemaURL string        `db:"schema_url" json:"schema_url" structs:"schema_url"` // schema_url
 	Operator  ProofOperator `db:"operator" json:"operator" structs:"operator"`       // operator
+	Field     string        `db:"field" json:"field" structs:"field"`                // field
 
 }

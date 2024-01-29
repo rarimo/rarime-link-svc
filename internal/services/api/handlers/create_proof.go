@@ -74,6 +74,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		OrgID:     orgID,
 		SchemaURL: req.Data.SchemaUrl,
 		Operator:  data.MustProofOperatorFromString(req.Data.Operator),
+		Field:     req.Data.Field,
 	}
 
 	err = Storage(r).ProofQ().Insert(&proof)
@@ -97,6 +98,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 				OrgId:     proof.OrgID.String(),
 				SchemaUrl: req.Data.SchemaUrl,
 				Operator:  proof.Operator.String(),
+				Field:     req.Data.Field,
 			},
 		},
 		Included: resources.Included{},

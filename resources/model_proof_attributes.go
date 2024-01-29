@@ -11,6 +11,8 @@ type ProofAttributes struct {
 	CreatedAt time.Time `json:"created_at"`
 	// The ID of the user who created the proof
 	Creator string `json:"creator"`
+	// The field that will be checked
+	Field string `json:"field"`
 	// The operator that will be used to check the proof
 	Operator string `json:"operator"`
 	// The ID of the organization that issued the proof's claim

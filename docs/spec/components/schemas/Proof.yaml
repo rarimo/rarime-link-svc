@@ -14,6 +14,7 @@ allOf:
           - org_id
           - schema_url
           - operator
+          - field
         properties:
           creator:
             type: string
@@ -40,3 +41,7 @@ allOf:
             type: string
             description: The operator that will be used to check the proof
             example: "$eq"
+          field:
+            type: string
+            description: The field that will be checked
+            example: "groupID"
