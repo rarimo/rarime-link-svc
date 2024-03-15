@@ -19,3 +19,6 @@ db:
 
 auth:
   addr: auth-svc:8000
+
+points:
+  addr: https://...

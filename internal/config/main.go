@@ -4,6 +4,7 @@ import (
 	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/internal/data/pg"
+	points "github.com/rarimo/rarime-points-svc/pkg/connector"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/kit/kv"
@@ -18,6 +19,7 @@ type Config interface {
 	LinkConfiger
 	RunningPeriods
 	SubServices
+	points.Pointer
 	Storage() data.Storage
 }
 
@@ -30,6 +32,7 @@ type config struct {
 	LinkConfiger
 	RunningPeriods
 	SubServices
+	points.Pointer
 
 	getter kv.Getter
 }
@@ -44,6 +47,7 @@ func New(getter kv.Getter) Config {
 		SubServices:    NewSubServices(),
 		Databaser:      pgdb.NewDatabaser(getter),
 		Auther:         auth.NewAuther(getter),
+		Pointer:        points.NewPointer(getter),
 	}
 }
 

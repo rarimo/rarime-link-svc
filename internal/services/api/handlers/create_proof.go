@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,6 +12,7 @@ import (
 	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
+	points "github.com/rarimo/rarime-points-svc/pkg/connector"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -82,6 +85,15 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		Log(r).WithError(err).Error("failed to create proof")
 		ape.RenderErr(w, problems.InternalError())
 		return
+	}
+
+	pointsError := Points(r).FulfillEvent(context.Background(),
+		points.FulfillEventRequest{
+			UserDID:   req.Data.UserDid,
+			EventType: fmt.Sprintf("generate_proof_%s", req.Data.ProofType),
+		})
+	if pointsError != nil {
+		Log(r).WithError(pointsError).Warnf("error code: %s", pointsError.Code)
 	}
 
 	ape.Render(w, resources.ProofResponse{

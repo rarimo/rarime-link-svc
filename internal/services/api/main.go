@@ -30,6 +30,7 @@ func Run(ctx context.Context, cfg config.Config) {
 		ape.CtxMiddleware(
 			handlers.CtxLog(cfg.Log()),
 			handlers.CtxStorage(cfg.Storage()),
+			handlers.CtxPoints(cfg.Points()),
 		),
 	)
 
