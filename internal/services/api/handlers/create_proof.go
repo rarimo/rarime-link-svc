@@ -93,7 +93,7 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 			EventType: fmt.Sprintf("generate_proof_%s", req.Data.ProofType),
 		})
 	if pointsError != nil {
-		Log(r).WithError(pointsError).Warnf("error code: %s", pointsError.Code)
+		Log(r).WithError(pointsError).Errorf("error occurred while fulfilling event. error code: %s", pointsError.Code)
 	}
 
 	ape.Render(w, resources.ProofResponse{
