@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -68,6 +69,16 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(UserClaim(r)) == 0 {
+		Log(r).Debug("Public proof verification")
+	}
+
+	verify := false
+	if len(UserClaim(r)) == 0 && !auth.Authenticates(UserClaim(r), auth.UserGrant(link.UserID)) {
+		Log(r).Debug("Authorized proof verification")
+		verify = true
+	}
+
 	response := resources.LinkResponse{
 		Data: resources.Link{
 			Key: resources.Key{
@@ -89,6 +100,11 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
+
+		if verify {
+			getPointsForVerifyProof(r, proof)
+		}
+
 		included.Add(&resources.Proof{
 			Key: resources.Key{
 				ID:   proof.ID.String(),
