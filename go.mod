@@ -11,7 +11,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/google/uuid v1.6.0
 	github.com/rarimo/rarime-auth-svc v0.0.1-rc9
-	github.com/rarimo/rarime-points-svc v0.0.0-20240314115010-5cd89e3850e5
+	github.com/rarimo/rarime-points-svc v0.0.0-20240318161256-5c7100386a47
 	github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a
 	github.com/rubenv/sql-migrate v1.6.1
 	gitlab.com/distributed_lab/ape v1.7.1

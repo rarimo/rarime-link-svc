@@ -51,14 +51,19 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(UserClaim(r)) == 0 && !auth.Authenticates(UserClaim(r), auth.UserGrant(proof.Creator)) {
-		Log(r).Debug("Authorized proof verification")
-		getPointsForVerifyProof(r, proof)
+	authorized := true
+
+	who := "Authorized(owner) proof verification"
+	if len(UserClaim(r)) == 0 {
+		authorized = false
+		who = "Public proof verification"
 	}
 
-	if len(UserClaim(r)) == 0 {
-		Log(r).Debug("Public proof verification")
+	if authorized && !auth.Authenticates(UserClaim(r), auth.UserGrant(proof.Creator)) {
+		who = "Authorized(not owner) proof verification"
+		getPointsForVerifyProof(r, proof)
 	}
+	Log(r).Debug(who)
 
 	ape.Render(w, resources.ProofResponse{
 		Data: resources.Proof{
