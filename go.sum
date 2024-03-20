@@ -288,8 +288,8 @@ github.com/prometheus/procfs v0.9.0 h1:wzCHvIvM5SxWqYvwgVL7yJY8Lz3PKn49KQtpgMYJf
 github.com/prometheus/procfs v0.9.0/go.mod h1:+pB4zwohETzFnmlpe6yd2lSc+0/46IYZRB/chUwxUZY=
 github.com/rarimo/rarime-auth-svc v0.0.1-rc9 h1:JZfq1q3WaaLwa8ICk8RHEx4+ojl/JBE8N5zJ/uHZUwM=
 github.com/rarimo/rarime-auth-svc v0.0.1-rc9/go.mod h1:48c8FsJixnLeWx8F8MDy79FvhU1r0oTU11mwP3JPngQ=
-github.com/rarimo/rarime-points-svc v0.0.0-20240318161256-5c7100386a47 h1:Rtt8+mQ+0Gd+fb7MV7zXiPWj2fkA6FBbsW+hIdpjojQ=
-github.com/rarimo/rarime-points-svc v0.0.0-20240318161256-5c7100386a47/go.mod h1:mEvQiwTvJYdUP/sCJGl/uIX+qnrvYLYYl9PTyJ0Zick=
+github.com/rarimo/rarime-points-svc v0.0.0-20240320140808-719069ac2e30 h1:2zxkQmEW5Qn9AqapyZAbIJY7PU5uLm2FFTF664sBFyQ=
+github.com/rarimo/rarime-points-svc v0.0.0-20240320140808-719069ac2e30/go.mod h1:mEvQiwTvJYdUP/sCJGl/uIX+qnrvYLYYl9PTyJ0Zick=
 github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a h1:aqz/1mU+rK/xLqf2/NHu+0fUGbVNf+9DYFI70fQo0M0=
 github.com/rarimo/xo v1.0.6-0.20231005111658-6ba1ce8f056a/go.mod h1:EYFR6RRqIlnpjcl/SgPgYn8Bmw4+5itRRbPCiSylCds=
 github.com/regen-network/protobuf v1.3.3-alpha.regen.1 h1:OHEc+q5iIAXpqiqFKeLpu5NwTIkVXUs48vFMwzqpqY4=

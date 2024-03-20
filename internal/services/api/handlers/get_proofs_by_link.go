@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/rarimo/rarime-auth-svc/pkg/auth"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -83,6 +84,8 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 	}
 	Log(r).Debug(who)
 
+	var proofs []data.Proof
+
 	response := resources.LinkResponse{
 		Data: resources.Link{
 			Key: resources.Key{
@@ -105,9 +108,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if verify {
-			getPointsForVerifyProof(r, proof)
-		}
+		proofs = append(proofs, *proof)
 
 		included.Add(&resources.Proof{
 			Key: resources.Key{
@@ -127,6 +128,10 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	response.Included = included
+
+	if verify {
+		getPointsForVerifyProofs(r, proofs, link.UserID, UserClaim(r)[0].User)
+	}
 
 	ape.Render(w, response)
 }

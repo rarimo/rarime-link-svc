@@ -53,7 +53,7 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 
 	if !auth.Authenticates(UserClaim(r), auth.UserGrant(proof.Creator)) {
 		Log(r).Debug("Proof verification")
-		getPointsForVerifyProof(r, proof)
+		getPointsForVerifyProofs(r, []data.Proof{*proof}, proof.Creator, UserClaim(r)[0].User)
 	}
 
 	ape.Render(w, resources.ProofResponse{
@@ -78,15 +78,20 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getPointsForVerifyProof(r *http.Request, proof *data.Proof) {
-	pointsError := Points(r).FulfillVerifyProofEvent(context.Background(),
-		points.FulfillVerifyProofEventRequest{
-			UserDID:     proof.Creator,
-			ProofType:   proof.Type,
-			VerifierDID: UserClaim(r)[0].User,
-		})
+func getPointsForVerifyProofs(r *http.Request, proofs []data.Proof, creator, verifier string) {
+	req := points.FulfillVerifyProofEventRequest{
+		UserDID:     creator,
+		ProofTypes:  make([]string, len(proofs)),
+		VerifierDID: verifier,
+	}
+
+	for i, proof := range proofs {
+		req.ProofTypes[i] = proof.Type
+	}
+
+	pointsError := Points(r).FulfillVerifyProofEvent(context.Background(), req)
 
 	if pointsError != nil {
-		Log(r).WithError(pointsError).Errorf("error occurred while fulfilling verify events for proof %s. error code: %s", proof.Type, pointsError.Code)
+		Log(r).WithError(pointsError).Errorf("error occurred while fulfilling verify events for proof %s. error code: %s", proofs, pointsError.Code)
 	}
 }
