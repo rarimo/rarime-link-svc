@@ -57,7 +57,7 @@ func Run(ctx context.Context, cfg config.Config) {
 				})
 
 				r.Route("/{link_id}", func(r chi.Router) {
-					r.Use(handlers.AuthMiddleware(cfg.Auth(), cfg.Log()))
+					r.Use(handlers.OptAuthMiddleware(cfg.Auth(), cfg.Log()))
 					r.Get("/", handlers.GetLinkByID)
 				})
 			})
