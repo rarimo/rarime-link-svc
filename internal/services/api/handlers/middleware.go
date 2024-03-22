@@ -29,7 +29,7 @@ func OptAuthMiddleware(auth *auth.Client, log *logan.Entry) func(http.Handler) h
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			claims, err := auth.ValidateJWT(r.Header)
 			if err != nil {
-				log.WithError(err).Warn("failed to execute auth validate request. May be public proof verification")
+				log.WithError(err).Debug("Auth failed, public logic will be executed")
 			}
 
 			next.ServeHTTP(w, r.WithContext(CtxUserClaim(claims)(r.Context())))

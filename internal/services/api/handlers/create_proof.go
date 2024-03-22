@@ -87,13 +87,14 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pointsError := Points(r).FulfillEvent(context.Background(),
-		points.FulfillEventRequest{
-			UserDID:   req.Data.UserDid,
-			EventType: fmt.Sprintf("generate_proof_%s", req.Data.ProofType),
-		})
-	if pointsError != nil {
+	pointsError := Points(r).FulfillEvent(context.Background(), points.FulfillEventRequest{
+		UserDID:   req.Data.UserDid,
+		EventType: fmt.Sprintf("generate_proof_%s", req.Data.ProofType),
+	})
+	if !isNormalFlowError(pointsError) {
 		Log(r).WithError(pointsError).Errorf("error occurred while fulfilling event")
+		ape.RenderErr(w, problems.InternalError())
+		return
 	}
 
 	ape.Render(w, resources.ProofResponse{
@@ -115,4 +116,17 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		},
 		Included: resources.Included{},
 	})
+}
+
+// There are cases when we can safely ignore error and continue the flow, because
+// those codes can occur in normal flow
+func isNormalFlowError(err *points.Error) bool {
+	if err == nil {
+		return true
+	}
+	switch err.Code {
+	case points.CodeEventExpired, points.CodeEventDisabled, points.CodeEventNotFound:
+		return true
+	}
+	return false
 }

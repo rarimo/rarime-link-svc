@@ -51,9 +51,17 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// User is not eligible for rewards for their own proof verification
 	if !auth.Authenticates(UserClaim(r), auth.UserGrant(proof.Creator)) {
 		Log(r).Debug("Proof verification")
-		getPointsForVerifyProofs(r, []data.Proof{*proof}, proof.Creator, UserClaim(r)[0].User)
+		// while auth is mandatory on this endpoint, it is guaranteed that we have at
+		// least one claim with valid user DID
+		verifier := UserClaim(r)[0].User
+		ok := getPointsForVerifyProofs(r, []data.Proof{*proof}, proof.Creator, verifier)
+		if !ok {
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
 	}
 
 	ape.Render(w, resources.ProofResponse{
@@ -78,7 +86,7 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getPointsForVerifyProofs(r *http.Request, proofs []data.Proof, creator, verifier string) {
+func getPointsForVerifyProofs(r *http.Request, proofs []data.Proof, creator, verifier string) (ok bool) {
 	req := points.FulfillVerifyProofEventRequest{
 		UserDID:     creator,
 		ProofTypes:  make([]string, len(proofs)),
@@ -90,8 +98,10 @@ func getPointsForVerifyProofs(r *http.Request, proofs []data.Proof, creator, ver
 	}
 
 	pointsError := Points(r).FulfillVerifyProofEvent(context.Background(), req)
-
-	if pointsError != nil {
-		Log(r).WithError(pointsError).Errorf("error occurred while fulfilling verify events for proof %s. error code: %s", proofs, pointsError.Code)
+	if !isNormalFlowError(pointsError) {
+		Log(r).WithError(pointsError).Errorf("Error occurred while event fulfillment for proofs %s", proofs)
+		return false
 	}
+
+	return true
 }

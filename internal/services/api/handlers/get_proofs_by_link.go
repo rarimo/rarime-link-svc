@@ -70,21 +70,20 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorized := true
-	verify := false
-	who := "Authorized(owner) proofs verification"
-	if len(UserClaim(r)) == 0 {
-		authorized = false
-		who = "Public proofs verification"
+	var (
+		authorized                = len(UserClaim(r)) > 0
+		who                       = "Authorized(owner)"
+		fulfillVerificationEvents = false
+	)
+	if !authorized {
+		who = "Public"
 	}
-
+	// preventing self-verification
 	if authorized && !auth.Authenticates(UserClaim(r), auth.UserGrant(link.UserID)) {
-		who = "Authorized(not owner) proofs verification"
-		verify = true
+		who = "Authorized(not owner)"
+		fulfillVerificationEvents = true
 	}
-	Log(r).Debug(who)
-
-	var proofs []data.Proof
+	Log(r).Debugf("%s proofs verification", who)
 
 	response := resources.LinkResponse{
 		Data: resources.Link{
@@ -99,6 +98,7 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	proofs := make([]data.Proof, 0, len(links))
 	included := resources.Included{}
 	for _, linkToProof := range links {
 		proof, err := Storage(r).ProofQ().ProofByID(linkToProof.ProofID, false)
@@ -129,8 +129,14 @@ func GetLinkByID(w http.ResponseWriter, r *http.Request) {
 	}
 	response.Included = included
 
-	if verify {
-		getPointsForVerifyProofs(r, proofs, link.UserID, UserClaim(r)[0].User)
+	if fulfillVerificationEvents {
+		// ensured above on fulfillVerificationEvents assignment
+		verifier := UserClaim(r)[0].User
+		ok := getPointsForVerifyProofs(r, proofs, link.UserID, verifier)
+		if !ok {
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
 	}
 
 	ape.Render(w, response)
