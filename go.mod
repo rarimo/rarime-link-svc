@@ -2,8 +2,6 @@ module github.com/rarimo/rarime-link-svc
 
 go 1.22
 
-toolchain go1.22.0
-
 require (
 	github.com/Masterminds/squirrel v1.4.0
 	github.com/alecthomas/kingpin v2.2.6+incompatible

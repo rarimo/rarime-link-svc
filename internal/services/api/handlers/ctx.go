@@ -51,7 +51,7 @@ func UserClaim(r *http.Request) []resources.Claim {
 
 func CtxPoints(pointsCon *points.Client) func(context.Context) context.Context {
 	return func(ctx context.Context) context.Context {
-		return context.WithValue(ctx, pointsCtxKey, *pointsCon)
+		return context.WithValue(ctx, pointsCtxKey, pointsCon)
 	}
 }
 
