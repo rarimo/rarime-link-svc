@@ -6,6 +6,7 @@ import (
 
 	"github.com/rarimo/rarime-auth-svc/resources"
 	"github.com/rarimo/rarime-link-svc/internal/data"
+	points "github.com/rarimo/rarime-points-svc/pkg/connector"
 	"gitlab.com/distributed_lab/logan/v3"
 )
 
@@ -15,6 +16,7 @@ const (
 	logCtxKey ctxKey = iota
 	storageCtxKey
 	userClaimCtxKey
+	pointsCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -45,4 +47,14 @@ func CtxUserClaim(claim []resources.Claim) func(context.Context) context.Context
 
 func UserClaim(r *http.Request) []resources.Claim {
 	return r.Context().Value(userClaimCtxKey).([]resources.Claim)
+}
+
+func CtxPoints(pointsCon *points.Client) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, pointsCtxKey, pointsCon)
+	}
+}
+
+func Points(r *http.Request) *points.Client {
+	return r.Context().Value(pointsCtxKey).(*points.Client)
 }

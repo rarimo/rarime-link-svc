@@ -23,3 +23,16 @@ func AuthMiddleware(auth *auth.Client, log *logan.Entry) func(http.Handler) http
 		})
 	}
 }
+
+func OptAuthMiddleware(auth *auth.Client, log *logan.Entry) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			claims, err := auth.ValidateJWT(r.Header)
+			if err != nil {
+				log.WithError(err).Debug("Auth failed, public logic will be executed")
+			}
+
+			next.ServeHTTP(w, r.WithContext(CtxUserClaim(claims)(r.Context())))
+		})
+	}
+}

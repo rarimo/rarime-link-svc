@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
 	"github.com/rarimo/rarime-auth-svc/pkg/auth"
+	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
+	points "github.com/rarimo/rarime-points-svc/pkg/connector"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -48,9 +51,17 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// User is not eligible for rewards for their own proof verification
 	if !auth.Authenticates(UserClaim(r), auth.UserGrant(proof.Creator)) {
-		ape.RenderErr(w, problems.Unauthorized())
-		return
+		Log(r).Debug("Proof verification")
+		// while auth is mandatory on this endpoint, it is guaranteed that we have at
+		// least one claim with valid user DID
+		verifier := UserClaim(r)[0].User
+		ok := getPointsForVerifyProofs(r, []data.Proof{*proof}, proof.Creator, verifier)
+		if !ok {
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
 	}
 
 	ape.Render(w, resources.ProofResponse{
@@ -73,4 +84,24 @@ func ProofByID(w http.ResponseWriter, r *http.Request) {
 		Included: resources.Included{},
 	})
 
+}
+
+func getPointsForVerifyProofs(r *http.Request, proofs []data.Proof, creator, verifier string) (ok bool) {
+	req := points.FulfillVerifyProofEventRequest{
+		UserDID:     creator,
+		ProofTypes:  make([]string, len(proofs)),
+		VerifierDID: verifier,
+	}
+
+	for i, proof := range proofs {
+		req.ProofTypes[i] = proof.Type
+	}
+
+	pointsError := Points(r).FulfillVerifyProofEvent(context.Background(), req)
+	if !isNormalFlowError(pointsError) {
+		Log(r).WithError(pointsError).Errorf("Error occurred while event fulfillment for proofs %s", proofs)
+		return false
+	}
+
+	return true
 }

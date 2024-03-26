@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,6 +12,7 @@ import (
 	"github.com/rarimo/rarime-auth-svc/pkg/auth"
 	"github.com/rarimo/rarime-link-svc/internal/data"
 	"github.com/rarimo/rarime-link-svc/resources"
+	points "github.com/rarimo/rarime-points-svc/pkg/connector"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -84,6 +87,16 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	pointsError := Points(r).FulfillEvent(context.Background(), points.FulfillEventRequest{
+		UserDID:   req.Data.UserDid,
+		EventType: fmt.Sprintf("generate_proof_%s", req.Data.ProofType),
+	})
+	if !isNormalFlowError(pointsError) {
+		Log(r).WithError(pointsError).Errorf("error occurred while fulfilling event")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
 	ape.Render(w, resources.ProofResponse{
 		Data: resources.Proof{
 			Key: resources.Key{
@@ -103,4 +116,17 @@ func CreateProof(w http.ResponseWriter, r *http.Request) {
 		},
 		Included: resources.Included{},
 	})
+}
+
+// There are cases when we can safely ignore error and continue the flow, because
+// those codes can occur in normal flow
+func isNormalFlowError(err *points.Error) bool {
+	if err == nil {
+		return true
+	}
+	switch err.Code {
+	case points.CodeEventExpired, points.CodeEventDisabled, points.CodeEventNotFound:
+		return true
+	}
+	return false
 }
